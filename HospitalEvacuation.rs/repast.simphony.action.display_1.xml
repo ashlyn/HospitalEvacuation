@@ -3,30 +3,30 @@
   <type>2D</type>
   <styles>
     <entry>
-      <string>bitspls.evacuation.GasParticle</string>
+      <string>bitspls.evacuation.agents.Doctor</string>
       <string>repast.simphony.visualization.editedStyle.EditedStyle2D</string>
     </entry>
     <entry>
-      <string>bitspls.evacuation.Patient</string>
+      <string>bitspls.evacuation.agents.GasParticle</string>
       <string>repast.simphony.visualization.editedStyle.EditedStyle2D</string>
     </entry>
     <entry>
-      <string>bitspls.evacuation.Doctor</string>
+      <string>bitspls.evacuation.agents.Patient</string>
       <string>repast.simphony.visualization.editedStyle.EditedStyle2D</string>
     </entry>
   </styles>
   <editedStyles>
     <entry>
-      <string>bitspls.evacuation.GasParticle</string>
-      <string>bitspls.evacuation.GasParticle.style_0.xml</string>
+      <string>bitspls.evacuation.agents.Doctor</string>
+      <string>bitspls.evacuation.agents.Doctor.style_0.xml</string>
     </entry>
     <entry>
-      <string>bitspls.evacuation.Patient</string>
-      <string>bitspls.evacuation.Patient.style_0.xml</string>
+      <string>bitspls.evacuation.agents.GasParticle</string>
+      <string>bitspls.evacuation.agents.GasParticle.style_0.xml</string>
     </entry>
     <entry>
-      <string>bitspls.evacuation.Doctor</string>
-      <string>bitspls.evacuation.Doctor.style_0.xml</string>
+      <string>bitspls.evacuation.agents.Patient</string>
+      <string>bitspls.evacuation.agents.Patient.style_0.xml</string>
     </entry>
   </editedStyles>
   <netStyles/>
@@ -39,22 +39,22 @@
     <pType>LAST</pType>
     <duration>-1.0</duration>
     <frequency>REPEAT</frequency>
-    <hashCode>183149605</hashCode>
+    <hashCode>-1162128544</hashCode>
   </schedParams>
   <layoutClassName>foo.bar.baz</layoutClassName>
   <layoutProjection>space</layoutProjection>
   <layoutInterval>0</layoutInterval>
   <layerOrder>
     <entry>
-      <string>bitspls.evacuation.GasParticle</string>
+      <string>bitspls.evacuation.agents.Doctor</string>
       <int>2</int>
     </entry>
     <entry>
-      <string>bitspls.evacuation.Patient</string>
+      <string>bitspls.evacuation.agents.GasParticle</string>
       <int>0</int>
     </entry>
     <entry>
-      <string>bitspls.evacuation.Doctor</string>
+      <string>bitspls.evacuation.agents.Patient</string>
       <int>1</int>
     </entry>
   </layerOrder>
