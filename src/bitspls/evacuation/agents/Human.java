@@ -10,6 +10,19 @@ public abstract class Human {
 	private boolean dead;
 	private ContinuousSpace<Object> space;
 	private Grid<Object> grid;
+	private int radiusOfKnowledge;
+	private int speed;
+	
+	protected void moveTowards(GridPoint pt) {
+		if (pt != null && !pt.equals(grid.getLocation(this))) {
+			NdPoint myPoint = space.getLocation(this);
+			NdPoint otherPoint = new NdPoint(pt.getX(), pt.getY());
+			double angle = SpatialMath.calcAngleFor2DMovement(space, myPoint, otherPoint);
+			space.moveByVector(this, 2, angle, 0);
+			myPoint = space.getLocation(this);
+			grid.moveTo(this, (int)myPoint.getX(), (int)myPoint.getY());
+		}
+	}
 	
 	protected boolean isDead() {
 		return this.dead;
@@ -39,14 +52,19 @@ public abstract class Human {
 		this.grid = grid;
 	}
 	
-	protected void moveTowards(GridPoint pt) {
-		if (pt != null && !pt.equals(grid.getLocation(this))) {
-			NdPoint myPoint = space.getLocation(this);
-			NdPoint otherPoint = new NdPoint(pt.getX(), pt.getY());
-			double angle = SpatialMath.calcAngleFor2DMovement(space, myPoint, otherPoint);
-			space.moveByVector(this, 2, angle, 0);
-			myPoint = space.getLocation(this);
-			grid.moveTo(this, (int)myPoint.getX(), (int)myPoint.getY());
-		}
+	protected int getRadiusOfKnowledge() {
+		return this.radiusOfKnowledge;
+	}
+	
+	protected void setRadiusOfKnowledge(int r) {
+		this.radiusOfKnowledge = r;
+	}
+	
+	protected int getSpeed() {
+		return this.speed;
+	}
+	
+	protected void setSpeed(int speed) {
+		this.speed = speed;
 	}
 }
