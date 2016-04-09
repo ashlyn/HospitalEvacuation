@@ -40,12 +40,12 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 			context.add(new GasParticle(space, grid));
 		}
 		
-		int doctorCount = 20;
+		int doctorCount = 1;
 		for (int i = 0; i < doctorCount; i++) {
 			context.add(new Doctor(space, grid));
 		}
 		
-		int patientCount = 100;
+		int patientCount = 10;
 		for (int i = 0; i < patientCount; i++) {
 			context.add(new Patient(space, grid));
 		}

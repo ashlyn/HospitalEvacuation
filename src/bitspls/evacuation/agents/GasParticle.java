@@ -53,9 +53,9 @@ public class GasParticle {
 					context.add(gas);
 					space.moveTo(gas, spacePt.getX(), spacePt.getY());
 					grid.moveTo(gas, pointWithLeastGas.getX(), pointWithLeastGas.getY());
-					poison();
 				}
 			}
+			poison();
 		}
 	}
 	
