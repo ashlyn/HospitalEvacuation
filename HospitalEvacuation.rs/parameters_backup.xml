@@ -6,12 +6,6 @@
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 									
 		/>
-				<parameter name="door_count" displayName="Door Count" type="int" 
-						defaultValue="5" 
-						isReadOnly="false" 
-						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
-									
-		/>
 				<parameter name="doctor_count" displayName="Doctor Count" type="int" 
 						defaultValue="20" 
 						isReadOnly="false" 

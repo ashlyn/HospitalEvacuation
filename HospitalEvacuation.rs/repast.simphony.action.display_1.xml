@@ -14,6 +14,10 @@
       <string>bitspls.evacuation.agents.Patient</string>
       <string>repast.simphony.visualization.editedStyle.EditedStyle2D</string>
     </entry>
+    <entry>
+      <string>bitspls.evacuation.Door</string>
+      <string>repast.simphony.visualization.editedStyle.EditedStyle2D</string>
+    </entry>
   </styles>
   <editedStyles>
     <entry>
@@ -28,6 +32,10 @@
       <string>bitspls.evacuation.agents.Patient</string>
       <string>bitspls.evacuation.agents.Patient.style_0.xml</string>
     </entry>
+    <entry>
+      <string>bitspls.evacuation.Door</string>
+      <string>bitspls.evacuation.Door.style_3.xml</string>
+    </entry>
   </editedStyles>
   <netStyles/>
   <editedNetStyles/>
@@ -39,7 +47,7 @@
     <pType>LAST</pType>
     <duration>-1.0</duration>
     <frequency>REPEAT</frequency>
-    <hashCode>-2046578159</hashCode>
+    <hashCode>1578851614</hashCode>
   </schedParams>
   <layoutClassName>foo.bar.baz</layoutClassName>
   <layoutProjection>space</layoutProjection>
@@ -56,6 +64,10 @@
     <entry>
       <string>bitspls.evacuation.agents.Patient</string>
       <int>1</int>
+    </entry>
+    <entry>
+      <string>bitspls.evacuation.Door</string>
+      <int>3</int>
     </entry>
   </layerOrder>
   <projections>

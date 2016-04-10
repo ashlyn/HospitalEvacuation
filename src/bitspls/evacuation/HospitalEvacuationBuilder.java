@@ -1,14 +1,16 @@
 package bitspls.evacuation;
 
-import bitspls.evacuation.agents.Doctor;
-import bitspls.evacuation.agents.GasParticle;
-import bitspls.evacuation.agents.Patient;
+import java.util.ArrayList;
+import java.util.List;
+
 import repast.simphony.context.Context;
 import repast.simphony.context.space.continuous.ContinuousSpaceFactory;
 import repast.simphony.context.space.continuous.ContinuousSpaceFactoryFinder;
 import repast.simphony.context.space.grid.GridFactory;
 import repast.simphony.context.space.grid.GridFactoryFinder;
 import repast.simphony.dataLoader.ContextBuilder;
+import repast.simphony.engine.environment.RunEnvironment;
+import repast.simphony.parameter.Parameters;
 import repast.simphony.space.continuous.ContinuousSpace;
 import repast.simphony.space.continuous.NdPoint;
 import repast.simphony.space.continuous.RandomCartesianAdder;
@@ -16,13 +18,18 @@ import repast.simphony.space.grid.Grid;
 import repast.simphony.space.grid.GridBuilderParameters;
 import repast.simphony.space.grid.SimpleGridAdder;
 import repast.simphony.space.grid.StickyBorders;
+import bitspls.evacuation.agents.Doctor;
+import bitspls.evacuation.agents.GasParticle;
+import bitspls.evacuation.agents.Patient;
 
 public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 
 	@Override
-	public Context build(Context<Object> context) {
+	public Context<Object> build(Context<Object> context) {
 		context.setId("HospitalEvacuation");
 
+		Parameters params = RunEnvironment.getInstance().getParameters();
+		
 		ContinuousSpaceFactory spaceFactory = ContinuousSpaceFactoryFinder
 				.createContinuousSpaceFactory(null);
 		ContinuousSpace<Object> space = spaceFactory.createContinuousSpace(
@@ -40,12 +47,32 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 			context.add(new GasParticle(space, grid));
 		}
 		
-		int doctorCount = 20;
-		for (int i = 0; i < doctorCount; i++) {
-			context.add(new Doctor(space, grid));
+		List<Door> doors = new ArrayList<Door>();
+		
+		double[][] doorLocations = new double[][]
+				{ new double[] { 80, 74.9 },
+				new double[] { 20, 74.9 },
+				new double[] { 99.9, 28 },
+				new double[] { -99.9, 27 },
+				new double[] { 57, -74.9 }};
+		
+		int doorCount = params.getInteger("door_count");
+		for (int i = 0; i < doorCount; i++) {
+			Door door = new Door(space, grid);
+			context.add(door);
+			space.moveTo(door, doorLocations[i]);
+			doors.add(door);
 		}
 		
-		int patientCount = 100;
+		List<Doctor> doctors = new ArrayList<Doctor>();
+		int doctorCount = params.getInteger("doctor_count");
+		for (int i = 0; i < doctorCount; i++) {
+			Doctor doctor = new Doctor(space, grid);
+			context.add(doctor);
+			doctors.add(doctor);
+		}
+		
+		int patientCount = params.getInteger("patient_count");
 		for (int i = 0; i < patientCount; i++) {
 			context.add(new Patient(space, grid));
 		}
@@ -54,8 +81,51 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 			NdPoint pt = space.getLocation(obj);
 			grid.moveTo(obj, (int) pt.getX(), (int) pt.getY());
 		}
+		
+		for (Doctor doctor : doctors) {
+			findClosestThreeDoors(doctor, doors, space);
+		}
 
 		return context;
+	}
+	
+	private void findClosestThreeDoors(Doctor doctor, List<Door> doors, ContinuousSpace<Object> space) {
+		double closestDoorDistance = Double.POSITIVE_INFINITY;
+		double secondClosestDoorDistance = Double.POSITIVE_INFINITY;
+		double thirdClosestDoorDistance = Double.POSITIVE_INFINITY;
+		
+		NdPoint closestDoor = null,
+				secondClosestDoor = null,
+				thirdClosestDoor = null;
+		
+		NdPoint doctorLocation = space.getLocation(doctor);
+		
+		for (Door door : doors) {
+			NdPoint point = space.getLocation(door);
+			double distance = Math.sqrt(Math.pow(point.getX() - doctorLocation.getX(), 2)
+					+ Math.pow(point.getY() - doctorLocation.getY(), 2));
+			
+			if (distance < closestDoorDistance) {
+				thirdClosestDoor = secondClosestDoor;
+				thirdClosestDoorDistance = secondClosestDoorDistance;
+				secondClosestDoor = closestDoor;
+				secondClosestDoorDistance = closestDoorDistance;
+				closestDoorDistance = distance;
+				closestDoor = point;
+			} else if (distance < secondClosestDoorDistance) {
+				thirdClosestDoor = secondClosestDoor;
+				thirdClosestDoorDistance = secondClosestDoorDistance;
+				secondClosestDoorDistance = distance;
+				secondClosestDoor = point;
+			} else if (distance < thirdClosestDoorDistance) {
+				thirdClosestDoorDistance = distance;
+				thirdClosestDoor = point;
+			}
+		}
+		
+		doctor.addDoor(closestDoor);
+		doctor.addDoor(secondClosestDoor);
+		doctor.addDoor(thirdClosestDoor);
 	}
 
 }
