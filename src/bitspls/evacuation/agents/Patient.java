@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import repast.simphony.engine.schedule.ScheduledMethod;
+import repast.simphony.engine.watcher.Watch;
 import repast.simphony.query.space.grid.GridCell;
 import repast.simphony.query.space.grid.GridCellNgh;
 import repast.simphony.random.RandomHelper;
@@ -49,7 +50,7 @@ public class Patient extends Human {
 	}
 	
 	public Boolean shouldFollowDoctorAgent(Doctor doctor) {
-		double probabilityOfFollowingDoctor = 0.4*doctor.getCharisma() + 0.6*getPanic();
+		double probabilityOfFollowingDoctor = 0.4*doctor.getCharisma() + 0.6*(1 - getPanic());
 		return randomFollowGenerator(probabilityOfFollowingDoctor);
 	}
 	
@@ -65,44 +66,40 @@ public class Patient extends Human {
 	private List<GasParticle> findGasAgentsInRadiusOfKnowledge () {
 		int radiusOfKnowledge = getRadiusOfKnowledge();
 		GridPoint location = getGrid().getLocation(this);
-		int xLocation = location.getX();
-		int yLocation = location.getY();
+
+		GridCellNgh<GasParticle> nghCreator = new GridCellNgh<GasParticle>(getGrid(), location, GasParticle.class, radiusOfKnowledge, radiusOfKnowledge);
+		List<GridCell<GasParticle>> gridCells = nghCreator.getNeighborhood(true);
 		
 		List<GasParticle> gasAgentsInRadius = new ArrayList<GasParticle>();
 		
-		for(int i = xLocation - radiusOfKnowledge; i < xLocation + radiusOfKnowledge; i++) {
-			for(int j = yLocation - radiusOfKnowledge; j < yLocation + radiusOfKnowledge; j++) {
-				if(i != xLocation || j != yLocation) {
-					for (Object obj : getGrid().getObjectsAt(i, j)) {
-						if (obj instanceof GasParticle) {
-							gasAgentsInRadius.add((GasParticle) obj);
-						}
-					}
+		for (GridCell<GasParticle> cell : gridCells) {
+			for (Object obj: getGrid().getObjectsAt(cell.getPoint().getX(), cell.getPoint().getY())) {
+				if (obj instanceof GasParticle) {
+					gasAgentsInRadius.add((GasParticle) obj);
 				}
 			}
 		}
+		
 		return gasAgentsInRadius;
 	}
 	
 	private List<Patient> findPatientAgentsInRadiusOfKnowledge() {
 		int radiusOfKnowledge = getRadiusOfKnowledge();
 		GridPoint location = getGrid().getLocation(this);
-		int xLocation = location.getX();
-		int yLocation = location.getY();
 		
+		GridCellNgh<Patient> nghCreator = new GridCellNgh<Patient>(getGrid(), location, Patient.class, radiusOfKnowledge, radiusOfKnowledge);
+		List<GridCell<Patient>> gridCells = nghCreator.getNeighborhood(true);
+
 		List<Patient> patientsInRadius = new ArrayList<Patient>();
 		
-		for(int i = xLocation - radiusOfKnowledge; i < xLocation + radiusOfKnowledge; i++) {
-			for(int j = yLocation - radiusOfKnowledge; j < yLocation + radiusOfKnowledge; j++) {
-				if(i != xLocation || j != yLocation) {
-					for (Object obj : getGrid().getObjectsAt(i, j)) {
-						if (obj instanceof Patient) {
-							patientsInRadius.add((Patient) obj);
-						}
-					}
+		for (GridCell<Patient> cell : gridCells) {
+			for (Object obj: getGrid().getObjectsAt(cell.getPoint().getX(), cell.getPoint().getY())) {
+				if (obj instanceof Patient) {
+					patientsInRadius.add((Patient) obj);
 				}
 			}
 		}
+		
 		return patientsInRadius;
 	}
 	
