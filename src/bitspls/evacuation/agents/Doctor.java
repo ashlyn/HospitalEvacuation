@@ -80,7 +80,7 @@ public class Doctor extends Human {
 	public int getFollowers() {
 		return this.followers;
 	}
-	
+
 	public double getCharisma() {
 		return this.charisma;
 	}

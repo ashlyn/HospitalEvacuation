@@ -8,6 +8,7 @@ import bitspls.evacuation.agents.Doctor;
 import bitspls.evacuation.agents.GasParticle;
 import bitspls.evacuation.agents.Human;
 import repast.simphony.engine.schedule.ScheduledMethod;
+import repast.simphony.engine.watcher.Watch;
 import repast.simphony.query.space.grid.GridCell;
 import repast.simphony.query.space.grid.GridCellNgh;
 import repast.simphony.random.RandomHelper;
@@ -44,21 +45,28 @@ public class Patient extends Human {
 			GridPoint pointToMoveTo = null;
 			GridPoint leastGasPoint = findLeastGasPoint(pt);
 			
-			if (this.doctorToFollow == null || this.door != null) {
+			if (this.doctorToFollow == null) {
 				GridCellNgh<Doctor> doctorNghCreator = new GridCellNgh<Doctor>(this.getGrid(), pt, Doctor.class, this.getRadiusOfKnowledge(), this.getRadiusOfKnowledge());
 				List<GridCell<Doctor>> doctorGridCells = doctorNghCreator.getNeighborhood(true);
 				SimUtilities.shuffle(doctorGridCells, RandomHelper.getUniform());
 				
-				
+				double maxCharisma = 0.0;
+				Doctor targetDoctor = null;
 				for (GridCell<Doctor> cell : doctorGridCells) {
 					if (cell.size() > 0) {
 						for (Doctor doc : cell.items()) {
-							this.doctorToFollow = doc;
-							this.doctorToFollow.startFollowing();
-							this.movementMode = PatientMode.FOLLOW_DOCTOR;
-							break;
+							if(doc.getCharisma() > maxCharisma) {
+								targetDoctor = doc;
+								maxCharisma = doc.getCharisma();
+							}
 						}
 					}
+				}
+				
+				if(targetDoctor != null && shouldFollowDoctorAgent(targetDoctor)) {
+					this.doctorToFollow = targetDoctor;
+					this.doctorToFollow.startFollowing();
+					this.movementMode = PatientMode.FOLLOW_DOCTOR;
 				}
 			}
 			
@@ -124,9 +132,9 @@ public class Patient extends Human {
 			}
 		}
 	}
-		
-	public Boolean shouldFollowDoctorAgent(Doctor doctor) {
-		double probabilityOfFollowingDoctor = 0.4*doctor.getCharisma() + 0.6*getPanic();
+
+	public boolean shouldFollowDoctorAgent(Doctor doctor) {
+		double probabilityOfFollowingDoctor = 0.4*doctor.getCharisma() + 0.6*(1 - getPanic());
 		return randomFollowGenerator(probabilityOfFollowingDoctor);
 	}
 	
@@ -142,44 +150,40 @@ public class Patient extends Human {
 	private List<GasParticle> findGasAgentsInRadiusOfKnowledge () {
 		int radiusOfKnowledge = getRadiusOfKnowledge();
 		GridPoint location = getGrid().getLocation(this);
-		int xLocation = location.getX();
-		int yLocation = location.getY();
+
+		GridCellNgh<GasParticle> nghCreator = new GridCellNgh<GasParticle>(getGrid(), location, GasParticle.class, radiusOfKnowledge, radiusOfKnowledge);
+		List<GridCell<GasParticle>> gridCells = nghCreator.getNeighborhood(true);
 		
 		List<GasParticle> gasAgentsInRadius = new ArrayList<GasParticle>();
 		
-		for(int i = xLocation - radiusOfKnowledge; i < xLocation + radiusOfKnowledge; i++) {
-			for(int j = yLocation - radiusOfKnowledge; j < yLocation + radiusOfKnowledge; j++) {
-				if(i != xLocation || j != yLocation) {
-					for (Object obj : getGrid().getObjectsAt(i, j)) {
-						if (obj instanceof GasParticle) {
-							gasAgentsInRadius.add((GasParticle) obj);
-						}
-					}
+		for (GridCell<GasParticle> cell : gridCells) {
+			for (Object obj: getGrid().getObjectsAt(cell.getPoint().getX(), cell.getPoint().getY())) {
+				if (obj instanceof GasParticle) {
+					gasAgentsInRadius.add((GasParticle) obj);
 				}
 			}
 		}
+		
 		return gasAgentsInRadius;
 	}
 	
 	private List<Patient> findPatientAgentsInRadiusOfKnowledge() {
 		int radiusOfKnowledge = getRadiusOfKnowledge();
 		GridPoint location = getGrid().getLocation(this);
-		int xLocation = location.getX();
-		int yLocation = location.getY();
 		
+		GridCellNgh<Patient> nghCreator = new GridCellNgh<Patient>(getGrid(), location, Patient.class, radiusOfKnowledge, radiusOfKnowledge);
+		List<GridCell<Patient>> gridCells = nghCreator.getNeighborhood(true);
+
 		List<Patient> patientsInRadius = new ArrayList<Patient>();
 		
-		for(int i = xLocation - radiusOfKnowledge; i < xLocation + radiusOfKnowledge; i++) {
-			for(int j = yLocation - radiusOfKnowledge; j < yLocation + radiusOfKnowledge; j++) {
-				if(i != xLocation || j != yLocation) {
-					for (Object obj : getGrid().getObjectsAt(i, j)) {
-						if (obj instanceof Patient) {
-							patientsInRadius.add((Patient) obj);
-						}
-					}
+		for (GridCell<Patient> cell : gridCells) {
+			for (Object obj: getGrid().getObjectsAt(cell.getPoint().getX(), cell.getPoint().getY())) {
+				if (obj instanceof Patient) {
+					patientsInRadius.add((Patient) obj);
 				}
 			}
 		}
+		
 		return patientsInRadius;
 	}
 	
