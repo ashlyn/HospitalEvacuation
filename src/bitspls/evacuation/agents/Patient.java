@@ -2,6 +2,7 @@ package bitspls.evacuation.agents;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import bitspls.evacuation.Door;
 import bitspls.evacuation.agents.Doctor;
@@ -30,7 +31,7 @@ public class Patient extends Human {
 	private double patientPanicWeight;
 	private double gasPanicWeight;
 	
-	public Patient(ContinuousSpace<Object> space, Grid<Object> grid, double panic, double patientPanicWeight, double gasPanicWeight) {
+	public Patient(ContinuousSpace<Object> space, Grid<Object> grid, double patientPanicWeight, double gasPanicWeight, double meanPanic, double stdPanic, Random random) {
 		this.setSpace(space);
 		this.setGrid(grid);
 		this.setDead(false);
@@ -45,6 +46,7 @@ public class Patient extends Human {
 		this.doctorToFollow = null;
 		this.door = null;
 		this.exited = false;
+		this.panic = stdPanic * random.nextGaussian() + meanPanic;
 	}
 	
 	@ScheduledMethod(start = 1, interval = 1)
@@ -98,7 +100,7 @@ public class Patient extends Human {
 		return pointToMoveTo;
 	}
 	
-	private GridPoint findLeastGasPoint(GridPoint pt) {
+	protected GridPoint findLeastGasPoint(GridPoint pt) {
 		GridCellNgh<GasParticle> nghCreator = new GridCellNgh<GasParticle>(this.getGrid(), pt, GasParticle.class, this.getRadiusOfKnowledge(), this.getRadiusOfKnowledge());
 		List<GridCell<GasParticle>> gridCells = nghCreator.getNeighborhood(true);
 		SimUtilities.shuffle(gridCells, RandomHelper.getUniform());

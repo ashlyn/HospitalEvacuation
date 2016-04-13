@@ -5,26 +5,46 @@
 				isReadOnly="false" 
 				converter="repast.simphony.parameter.StringConverterFactory$IntConverter"				
 		/>
-		<parameter name="door_count" displayName="Door Count" type="int" 
-				defaultValue="5" 
-				isReadOnly="false" 
-				converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+				<parameter name="std_panic" displayName="StdDev Patient Panic" type="double" 
+						defaultValue="10.0" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+									
 		/>
-		<parameter name="doctor_count" displayName="Doctors" type="int" 
-				defaultValue="20" 
-				isReadOnly="false" 
-				converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+				<parameter name="mean_panic" displayName="Mean Patient Panic" type="double" 
+						defaultValue="50.0" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+									
 		/>
-		<parameter name="patient_count" displayName="Patient Count" type="int" 
-				defaultValue="100" 
-				isReadOnly="false" 
-				converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+				<parameter name="door_count" displayName="Doors" type="int" 
+						defaultValue="5" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+									
 		/>
-		<parameter name="starting_panic" displayName="Starting Panic Level" type="double" 
-				defaultValue="0.5" 
-				isReadOnly="false" 
-				converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
-							
+				<parameter name="mean_charisma" displayName="Mean Doctor Charisma" type="double" 
+						defaultValue="50.0" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+									
+		/>
+				<parameter name="doctor_count" displayName="Doctors" type="int" 
+						defaultValue="20" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+									
+		/>
+				<parameter name="std_charisma" displayName="StdDev Doctor Charisma" type="double" 
+						defaultValue="5.0" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+									
+		/>
+				<parameter name="patient_count" displayName="Patients" type="int" 
+						defaultValue="100" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 		/>
 		<parameter name="patient_weight" displayName="Patient Panic Weight" type="double" 
 				defaultValue="0.2" 

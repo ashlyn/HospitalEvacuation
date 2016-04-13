@@ -2,6 +2,7 @@ package bitspls.evacuation.agents;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javafx.util.Pair;
 import repast.simphony.engine.schedule.ScheduledMethod;
@@ -20,7 +21,7 @@ public class Doctor extends Human {
 	private double charisma;
 	private int stepsTakenAwayFromDoor;
 	
-	public Doctor(ContinuousSpace<Object> space, Grid<Object> grid) {
+	public Doctor(ContinuousSpace<Object> space, Grid<Object> grid, double meanCharisma, double stdCharisma, Random random) {
 		this.setSpace(space);
 		this.setGrid(grid);
 		this.setDead(false);
@@ -28,7 +29,7 @@ public class Doctor extends Human {
 		this.setSpeed(SPEED);
 		this.doorPoints = new ArrayList<>();
 		this.followers = 0;
-		this.charisma = .5;
+		this.charisma = stdCharisma * random.nextGaussian() + meanCharisma;
 		this.doctorMode = DoctorMode.DOOR_SEEK;
 		this.stepsTakenAwayFromDoor = 0;
 	}
