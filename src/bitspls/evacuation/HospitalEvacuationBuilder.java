@@ -36,12 +36,12 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 		ContinuousSpace<Object> space = spaceFactory.createContinuousSpace(
 				"space", context, new RandomCartesianAdder<Object>(),
 				new repast.simphony.space.continuous.StickyBorders(), new double[] {200, 150},
-				new double[] {100, 75});
+				new double[] {0, 0});
 
 		GridFactory gridFactory = GridFactoryFinder.createGridFactory(null);
 		Grid<Object> grid = gridFactory.createGrid("grid", context,
 				new GridBuilderParameters<Object>(new StickyBorders(),
-						new SimpleGridAdder<Object>(), true, new int[] {200, 150}, new int[] {100, 75}));
+						new SimpleGridAdder<Object>(), true, new int[] {200, 150}, new int[] {0, 0}));
 
 		int gasCount = 1;
 		for (int i = 0; i < gasCount; i++) {
@@ -51,11 +51,11 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 		List<Door> doors = new ArrayList<Door>();
 		
 		double[][] doorLocations = new double[][]
-				{ new double[] { 80, 74.9 },
-				new double[] { 20, 74.9 },
-				new double[] { 99.9, 28 },
-				new double[] { -99.9, 27 },
-				new double[] { 57, -74.9 }};
+				{ new double[] { 80, 74 },
+				new double[] { 20, 74 },
+				new double[] { 99, 28 },
+				new double[] { 99, 27 },
+				new double[] { 57, 74 }};
 		
 		int doorCount = params.getInteger("door_count");
 		for (int i = 0; i < doorCount; i++) {
@@ -80,9 +80,11 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 		
 		double meanPanic = params.getDouble("mean_panic");
 		double stdPanic = params.getDouble("std_panic");
+		double patientPanicWeight = params.getDouble("patient_weight");
+		double gasPanicWeight = params.getDouble("gas_weight");
 		int patientCount = params.getInteger("patient_count");
 		for (int i = 0; i < patientCount; i++) {
-			Patient p = new Patient(space, grid, meanPanic, stdPanic, r);
+			Patient p = new Patient(space, grid, patientPanicWeight, gasPanicWeight, meanPanic, stdPanic, r);
 			context.add(p);
 			System.out.println("Panic:  " + p.getPanic());
 		}
@@ -95,7 +97,7 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 		for (Doctor doctor : doctors) {
 			findClosestThreeDoors(doctor, doors, space);
 		}
-
+		
 		return context;
 	}
 	

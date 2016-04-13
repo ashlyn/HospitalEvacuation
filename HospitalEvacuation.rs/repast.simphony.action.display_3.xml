@@ -34,7 +34,7 @@
     </entry>
     <entry>
       <string>bitspls.evacuation.Door</string>
-      <string>bitspls.evacuation.Door.style_4.xml</string>
+      <string>bitspls.evacuation.Door.style_3.xml</string>
     </entry>
   </editedStyles>
   <netStyles/>
@@ -47,7 +47,7 @@
     <pType>LAST</pType>
     <duration>-1.0</duration>
     <frequency>REPEAT</frequency>
-    <hashCode>1671151549</hashCode>
+    <hashCode>1578851614</hashCode>
   </schedParams>
   <layoutClassName>foo.bar.baz</layoutClassName>
   <layoutProjection>space</layoutProjection>

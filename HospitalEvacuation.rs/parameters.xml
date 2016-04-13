@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <parameters>
-					<parameter name="randomSeed" displayName="Default Random Seed" type="int" 
-						defaultValue="__NULL__"
-						isReadOnly="false" 
-						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
-									
+		<parameter name="randomSeed" displayName="Default Random Seed" type="int" 
+				defaultValue="__NULL__"
+				isReadOnly="false" 
+				converter="repast.simphony.parameter.StringConverterFactory$IntConverter"				
 		/>
 				<parameter name="std_panic" displayName="StdDev Patient Panic" type="double" 
 						defaultValue="10.0" 
@@ -46,8 +45,17 @@
 						defaultValue="100" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
-									
 		/>
-		</parameters>
-
-
+		<parameter name="patient_weight" displayName="Patient Panic Weight" type="double" 
+				defaultValue="0.2" 
+				isReadOnly="false" 
+				converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+							
+		/>
+		<parameter name="gas_weight" displayName="Gas Panic Weight" type="double" 
+				defaultValue="0.3" 
+				isReadOnly="false" 
+				converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+							
+		/>
+</parameters>
