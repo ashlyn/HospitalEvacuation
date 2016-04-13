@@ -2,6 +2,7 @@ package bitspls.evacuation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import repast.simphony.context.Context;
 import repast.simphony.context.space.continuous.ContinuousSpaceFactory;
@@ -64,17 +65,26 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 			doors.add(door);
 		}
 		
+		Random r = new Random();
+		
 		List<Doctor> doctors = new ArrayList<Doctor>();
+		double meanCharisma = params.getDouble("mean_charisma");
+		double stdCharisma = params.getDouble("std_charisma");
 		int doctorCount = params.getInteger("doctor_count");
 		for (int i = 0; i < doctorCount; i++) {
-			Doctor doctor = new Doctor(space, grid);
+			Doctor doctor = new Doctor(space, grid, meanCharisma, stdCharisma, r);
 			context.add(doctor);
 			doctors.add(doctor);
+			System.out.println("Charisma:  " + doctor.getCharisma());
 		}
 		
+		double meanPanic = params.getDouble("mean_panic");
+		double stdPanic = params.getDouble("std_panic");
 		int patientCount = params.getInteger("patient_count");
 		for (int i = 0; i < patientCount; i++) {
-			context.add(new Patient(space, grid));
+			Patient p = new Patient(space, grid, meanPanic, stdPanic, r);
+			context.add(p);
+			System.out.println("Panic:  " + p.getPanic());
 		}
 
 		for (Object obj : context) {

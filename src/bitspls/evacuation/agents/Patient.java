@@ -2,13 +2,13 @@ package bitspls.evacuation.agents;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import bitspls.evacuation.Door;
 import bitspls.evacuation.agents.Doctor;
 import bitspls.evacuation.agents.GasParticle;
 import bitspls.evacuation.agents.Human;
 import repast.simphony.engine.schedule.ScheduledMethod;
-import repast.simphony.engine.watcher.Watch;
 import repast.simphony.query.space.grid.GridCell;
 import repast.simphony.query.space.grid.GridCellNgh;
 import repast.simphony.random.RandomHelper;
@@ -19,14 +19,14 @@ import repast.simphony.util.SimUtilities;
 
 public class Patient extends Human {
 	private static final int SPEED = 2;
-	private double panic = 0.5;
 	
+	private double panic;	
 	private PatientMode movementMode;
 	private Doctor doctorToFollow;
 	private Door door;
 	private boolean exited;
 	
-	public Patient(ContinuousSpace<Object> space, Grid<Object> grid) {
+	public Patient(ContinuousSpace<Object> space, Grid<Object> grid, double meanPanic, double stdPanic, Random random) {
 		this.setSpace(space);
 		this.setGrid(grid);
 		this.setDead(false);
@@ -36,6 +36,7 @@ public class Patient extends Human {
 		this.doctorToFollow = null;
 		this.door = null;
 		this.exited = false;
+		this.panic = stdPanic * random.nextGaussian() + meanPanic;
 	}
 	
 	@ScheduledMethod(start = 1, interval = 1)
