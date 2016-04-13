@@ -19,6 +19,7 @@ public class Doctor extends Human {
 	private int followers;
 	private double charisma;
 	private int stepsTakenAwayFromDoor;
+	private double previousAngle;
 	
 	public Doctor(ContinuousSpace<Object> space, Grid<Object> grid) {
 		this.setSpace(space);
@@ -31,6 +32,7 @@ public class Doctor extends Human {
 		this.charisma = .5;
 		this.doctorMode = DoctorMode.DOOR_SEEK;
 		this.stepsTakenAwayFromDoor = 0;
+		this.previousAngle = Double.POSITIVE_INFINITY;
 	}
 	
 	public void addDoor(NdPoint doorPoint) {
@@ -49,16 +51,65 @@ public class Doctor extends Human {
 	}
 	
 	private void findPatients() {
-		if (stepsTakenAwayFromDoor < 30) {
+		if (stepsTakenAwayFromDoor < 20) {
 			moveAwayFromDoor();
 		} else {
+			if (previousAngle == Double.POSITIVE_INFINITY || Math.random() > 0.4) {
+				determineAngle();
+			}
+			
 			moveRandomly();
 		}
 	}
 	
+	private void determineAngle() {
+		previousAngle = Math.random() * Math.PI * 2; 
+	}
+	
 	private void moveRandomly() {
 		GridPoint pt = this.getGrid().getLocation(this);
-		GridPoint pointToMoveTo = super.findLeastGasPoint(pt);
+		
+		double angleB = previousAngle;
+		
+		double angleA = Math.PI / 2;
+		 
+		double angleC = (2 * Math.PI) - angleA - angleB;
+
+		double sideBLength = Math.sin(angleB);
+		double sideCLength = Math.sin(angleC);
+		
+		int newX = pt.getX();
+		int newY = pt.getY();
+		
+		if (angleB >= 0 && angleB <= Math.PI / 8) {
+			newX += sideCLength;
+			newY += sideBLength;
+		} else if (angleB > Math.PI / 8 && angleB <= Math.PI / 4) {
+			newX += sideCLength;
+			newY += sideBLength;
+		} else if (angleB > Math.PI / 4 && angleB <= Math.PI * 3 / 4) {
+			newX -= sideBLength;
+			newY += sideCLength;
+		} else if (angleB > Math.PI * 3 / 4 && angleB <= Math.PI) {
+			newX -= sideBLength;
+			newY += sideCLength;
+		} else if (angleB > Math.PI && angleB <= Math.PI * 5 / 4) {
+			newX -= sideCLength;
+			newY -= sideBLength;
+		} else if (angleB > Math.PI * 5 / 4 && angleB <= Math.PI * 3 / 2) {
+			newX -= sideCLength;
+			newY -= sideBLength;
+		} else if (angleB > Math.PI * 3 / 2 && angleB <= Math.PI * 7 / 4) {
+			newX += sideBLength;
+			newY -= sideCLength;
+		} else {
+			newX += sideBLength;
+			newY -= sideCLength;
+		}
+		
+		System.out.println("x,y" + newX + " " + newY);
+		
+		GridPoint pointToMoveTo = new GridPoint(newX, newY);
 		
 		super.moveTowards(pointToMoveTo);
 	}
@@ -111,12 +162,6 @@ public class Doctor extends Human {
 		GridPoint closestDoorPoint = Utility.ndPointToGridPoint(closestDoor);
 		
 		return new Pair<Double, GridPoint>(closestDoorDistance, closestDoorPoint);
-	}
-	
-	private GridPoint findNextLocation() {
-		
-		
-		return null;
 	}
 	
 	public void startFollowing() {

@@ -63,7 +63,7 @@ public abstract class Human {
 	
 	protected GridPoint findLeastGasPoint(GridPoint pt) {
 		GridCellNgh<GasParticle> nghCreator = new GridCellNgh<GasParticle>(this.getGrid(), pt, GasParticle.class, this.getRadiusOfKnowledge(), this.getRadiusOfKnowledge());
-		List<GridCell<GasParticle>> gridCells = nghCreator.getNeighborhood(true);
+		List<GridCell<GasParticle>> gridCells = nghCreator.getNeighborhood(false);
 		SimUtilities.shuffle(gridCells, RandomHelper.getUniform());
 		
 		GridPoint pointWithLeastGas = null;
