@@ -24,17 +24,23 @@ public class Patient extends Human {
 	private Doctor doctorToFollow;
 	private Door door;
 	private boolean exited;
+	private double basePanic;
 	private double panic;
 	private double worstCase;
+	private double patientPanicWeight;
+	private double gasPanicWeight;
 	
-	public Patient(ContinuousSpace<Object> space, Grid<Object> grid) {
+	public Patient(ContinuousSpace<Object> space, Grid<Object> grid, double panic, double patientPanicWeight, double gasPanicWeight) {
 		this.setSpace(space);
 		this.setGrid(grid);
 		this.setDead(false);
 		this.setRadiusOfKnowledge(10);
 		this.setSpeed(SPEED);
-		this.setPanic(0.5);
+		this.setBasePanic(panic);
+		this.setPanic(panic);
 		this.setWorstCase(calculateWorstCaseScenario());
+		this.setPatientPanicWeight(patientPanicWeight);
+		this.setGasPanicWeight(gasPanicWeight);
 		this.movementMode = PatientMode.AVOID_GAS;
 		this.doctorToFollow = null;
 		this.door = null;
@@ -136,9 +142,7 @@ public class Patient extends Human {
 	public double calculateNewPanicLevel() {
 		double gasFactor = calculateGasParticleFactor();
 		double patientFactor = calculateGasParticleFactor();
-		System.out.println("gas: " + gasFactor);
-		System.out.println("patient: " + patientFactor);
-		double panic = 0.4 + (0.2 * patientFactor) + (0.4 * gasFactor) ;
+		double panic = this.basePanic + (this.patientPanicWeight * patientFactor) + (this.gasPanicWeight * gasFactor) ;
 		System.out.println("new panic: " + panic);
 		return panic;
 	}
@@ -312,6 +316,18 @@ public class Patient extends Human {
 	
 	public void setWorstCase(double worstCase) {
 		this.worstCase = worstCase;
+	}
+	
+	public void setPatientPanicWeight(double weight) {
+		this.patientPanicWeight = weight;
+	}
+	
+	public void setGasPanicWeight(double weight) {
+		this.gasPanicWeight = weight;
+	}
+	
+	public void setBasePanic(double panic) {
+		this.basePanic = panic;
 	}
 	
 	enum PatientMode {

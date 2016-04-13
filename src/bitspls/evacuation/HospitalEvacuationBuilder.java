@@ -35,13 +35,13 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 		ContinuousSpace<Object> space = spaceFactory.createContinuousSpace(
 				"space", context, new RandomCartesianAdder<Object>(),
 				new repast.simphony.space.continuous.StickyBorders(), new double[] {200, 150},
-				new double[] {100, 75});
+				new double[] {0, 0});
 
 		GridFactory gridFactory = GridFactoryFinder.createGridFactory(null);
 		Grid<Object> grid = gridFactory.createGrid("grid", context,
 				new GridBuilderParameters<Object>(new StickyBorders(),
-						new SimpleGridAdder<Object>(), true, new int[] {200, 150}, new int[] {100, 75}));
-
+						new SimpleGridAdder<Object>(), true, new int[] {200, 150}, new int[] {0, 0}));
+		
 		int gasCount = 1;
 		for (int i = 0; i < gasCount; i++) {
 			context.add(new GasParticle(space, grid));
@@ -53,8 +53,8 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 				{ new double[] { 80, 74.9 },
 				new double[] { 20, 74.9 },
 				new double[] { 99.9, 28 },
-				new double[] { -99.9, 27 },
-				new double[] { 57, -74.9 }};
+				new double[] { 99.9, 27 },
+				new double[] { 57, 74.9 }};
 		
 		int doorCount = params.getInteger("door_count");
 		for (int i = 0; i < doorCount; i++) {
@@ -72,9 +72,12 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 			doctors.add(doctor);
 		}
 		
+		double patientPanicWeight = params.getDouble("patient_weight");
+		double gasPanicWeight = params.getDouble("gas_weight");
+		double startingPanic = params.getDouble("starting_panic");
 		int patientCount = params.getInteger("patient_count");
 		for (int i = 0; i < patientCount; i++) {
-			context.add(new Patient(space, grid));
+			context.add(new Patient(space, grid, startingPanic, patientPanicWeight, gasPanicWeight));
 		}
 
 		for (Object obj : context) {
@@ -85,7 +88,7 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 		for (Doctor doctor : doctors) {
 			findClosestThreeDoors(doctor, doors, space);
 		}
-
+		
 		return context;
 	}
 	
