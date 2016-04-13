@@ -67,21 +67,6 @@ public class Doctor extends Human {
 	private void moveTowardsDoor() {
 		GridPoint pt = this.getGrid().getLocation(this);
 		
-		GridCellNgh<GasParticle> nghCreator = new GridCellNgh<GasParticle>(this.getGrid(), pt, GasParticle.class, this.getRadiusOfKnowledge(), this.getRadiusOfKnowledge());
-		
-		List<GridCell<GasParticle>> gridCells = nghCreator.getNeighborhood(true);
-		SimUtilities.shuffle(gridCells, RandomHelper.getUniform());
-		GridPoint pointWithLeastGas = null;
-		for (GridCell<GasParticle> cell : gridCells) {
-			if (cell.size() == 0) {
-				pointWithLeastGas = cell.getPoint();
-			}
-		}
-		
-		if (pointWithLeastGas != null) {
-			pt = pointWithLeastGas;
-		}
-		
 		double closestDoorDistance = Double.POSITIVE_INFINITY;
 		NdPoint closestDoor = null;
 		for (NdPoint doorPoint : doorPoints) {
@@ -105,7 +90,9 @@ public class Doctor extends Human {
 		}
 	}
 	
-	private void findNextLocation() {
+	private GridPoint findNextLocation() {
 		
+		
+		return null;
 	}
 }
