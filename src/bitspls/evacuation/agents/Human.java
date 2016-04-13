@@ -43,7 +43,7 @@ public abstract class Human {
 				} else {
 					NdPoint point = new NdPoint(gasToAvoid.getX(), gasToAvoid.getY());
 					angle = SpatialMath.calcAngleFor2DMovement(space, myPoint, point);
-					angle -= Math.PI * 3 / 4;
+					angle -= (Math.PI / 2);
 				}
 			}
 			
@@ -155,6 +155,8 @@ public abstract class Human {
 				isInBounds = true;
 			} else if (height == bestHeight && (highLength && length > bestLength)
 					|| (!highLength && length < bestLength)) {
+				isInBounds = true;
+			} else if (bestHeight == -1) {
 				isInBounds = true;
 			}
 		}
