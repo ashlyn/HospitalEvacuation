@@ -4,13 +4,11 @@ import java.util.List;
 
 import repast.simphony.query.space.grid.GridCell;
 import repast.simphony.query.space.grid.GridCellNgh;
-import repast.simphony.random.RandomHelper;
 import repast.simphony.space.SpatialMath;
 import repast.simphony.space.continuous.ContinuousSpace;
 import repast.simphony.space.continuous.NdPoint;
 import repast.simphony.space.grid.Grid;
 import repast.simphony.space.grid.GridPoint;
-import repast.simphony.util.SimUtilities;
 
 public abstract class Human {
 	private static final double MOVEMENT_DISTANCE = 1;
@@ -63,18 +61,6 @@ public abstract class Human {
 		GridCellNgh<GasParticle> nghCreator = new GridCellNgh<GasParticle>(this.getGrid(), pt, GasParticle.class, 3, 3);
 		
 		List<GridCell<GasParticle>> gridCells = nghCreator.getNeighborhood(true);
-
-		double angleA = Math.PI / 2;
-		
-		double angleC = 2 * Math.PI - angleA - angleB;
-		
-		double sinA = 1/2;
-		
-		double sideBLength = Math.sin(angleB);
-		double sideCLength = Math.sin(angleC);
-		
-		int x = pt.getX();
-		int y = pt.getY();
 		
 		int currentBestX = -1;
 		int currentBestY = -1;
@@ -157,39 +143,6 @@ public abstract class Human {
 		}
 		
 		return isInBounds;
-	}
-	
-	private double computeAvoidanceAngle(double angle, GridPoint gasToAvoid) {
-		GridPoint pt = this.getGrid().getLocation(this);
-		
-		GridCellNgh<GasParticle> nghCreator = new GridCellNgh<GasParticle>(this.getGrid(), pt, GasParticle.class, 2, 2);
-		
-		List<GridCell<GasParticle>> gridCells = nghCreator.getNeighborhood(true);
-
-		double angleInDegrees = angle * 180 / Math.PI;
-		double remainingAngle = 270 - angleInDegrees;
-		
-		double sinA = Math.sin(90);
-		
-		double sideLength = 2 / sinA * Math.sin(angleInDegrees);
-		double otherSideLength = 2 / sinA * Math.sin(remainingAngle);
-		
-		// TODO figure out correct signs
-		if (angleInDegrees >= 0 && angleInDegrees <= 90) {
-			// B is y distance
-			// C is x distance
-		} else if (angleInDegrees > 90 && angleInDegrees <= 180) {
-			// B is x distance
-			// C is y distance
-		} else if (angleInDegrees > 180 && angleInDegrees <= 270) {
-			// B is y distance
-			// C is x distance
-		} else {
-			// B is x distance
-			// C is y distance
-		}
-		
-		return -1;
 	}
 	
 	protected boolean isDead() {
