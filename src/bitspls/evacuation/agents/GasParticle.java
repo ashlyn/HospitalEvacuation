@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import repast.simphony.context.Context;
+import repast.simphony.engine.environment.RunEnvironment;
+import repast.simphony.engine.schedule.Schedule;
 import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.query.space.grid.GridCell;
 import repast.simphony.query.space.grid.GridCellNgh;
@@ -25,10 +27,11 @@ public class GasParticle {
 		this.grid = grid;
 	}
 	
-	@ScheduledMethod(start = 1, interval = 10)
+	@ScheduledMethod(start = 1, interval = 1)
 	public void spawn() {
-		// get grid location of this Gas particle
-		if (!moved) {
+		int ticks = (int) RunEnvironment.getInstance().getCurrentSchedule().getTickCount();
+		
+		if (!moved && ticks % 10 == 0) {
 		GridPoint pt = grid.getLocation(this);
 		
 			if (pt != null) {
@@ -55,8 +58,8 @@ public class GasParticle {
 					grid.moveTo(gas, pointWithLeastGas.getX(), pointWithLeastGas.getY());
 				}
 			}
-			poison();
 		}
+		poison();
 	}
 	
 	public void poison() {

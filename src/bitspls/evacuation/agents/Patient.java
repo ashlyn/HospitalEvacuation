@@ -1,8 +1,11 @@
 package bitspls.evacuation.agents;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import bitspls.evacuation.Door;
+import bitspls.evacuation.agents.Doctor;
+import bitspls.evacuation.agents.GasParticle;
+import bitspls.evacuation.agents.Human;
 import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.query.space.grid.GridCell;
 import repast.simphony.query.space.grid.GridCellNgh;
@@ -16,6 +19,8 @@ public class Patient extends Human {
 	private static final int SPEED = 2;
 	
 	private Doctor doctorToFollow;
+	private Door door;
+	private boolean exited;
 	
 	public Patient(ContinuousSpace<Object> space, Grid<Object> grid) {
 		this.setSpace(space);
@@ -24,29 +29,51 @@ public class Patient extends Human {
 		this.setRadiusOfKnowledge(10);
 		this.setSpeed(SPEED);
 		this.doctorToFollow = null;
+		this.door = null;
+		this.exited = false;
 	}
 	
-	@ScheduledMethod(start = 1, interval = SPEED)
+	@ScheduledMethod(start = 1, interval = 1)
 	public void run() {
-		if (!isDead()) {
+		if (!isDead() && !this.exited) {
 			GridPoint pt = this.getGrid().getLocation(this);
-			
-			GridCellNgh<Doctor> doctorNghCreator = new GridCellNgh<Doctor>(this.getGrid(), pt, Doctor.class, this.getRadiusOfKnowledge(), this.getRadiusOfKnowledge());
-			List<GridCell<Doctor>> doctorGridCells = doctorNghCreator.getNeighborhood(true);
-			SimUtilities.shuffle(doctorGridCells, RandomHelper.getUniform());
-			
 			GridPoint pointToMoveTo = null;
 			GridPoint leastGasPoint = findLeastGasPoint(pt);
-			for (GridCell<Doctor> cell : doctorGridCells) {
-				if (cell.size() > 0) {
-					for (Doctor doc : cell.items()) {
-						this.doctorToFollow = doc;
-						break;
+			
+			if (this.doctorToFollow == null || this.door != null) {
+				GridCellNgh<Doctor> doctorNghCreator = new GridCellNgh<Doctor>(this.getGrid(), pt, Doctor.class, this.getRadiusOfKnowledge(), this.getRadiusOfKnowledge());
+				List<GridCell<Doctor>> doctorGridCells = doctorNghCreator.getNeighborhood(true);
+				SimUtilities.shuffle(doctorGridCells, RandomHelper.getUniform());
+				
+				
+				for (GridCell<Doctor> cell : doctorGridCells) {
+					if (cell.size() > 0) {
+						for (Doctor doc : cell.items()) {
+							this.doctorToFollow = doc;
+							this.doctorToFollow.startFollowing();
+							break;
+						}
 					}
 				}
 			}
 			
-			if (this.doctorToFollow == null || !this.doctorToFollow.isDead()) {
+			if (this.door == null) {
+				GridCellNgh<Door> doorNghCreator = new GridCellNgh<Door>(this.getGrid(), pt, Door.class, this.getRadiusOfKnowledge(), this.getRadiusOfKnowledge());
+				List<GridCell<Door>> doorGridCells = doorNghCreator.getNeighborhood(true);
+				
+				for (GridCell<Door> cell : doorGridCells) {
+					if (cell.size() > 0) {
+						for (Door door : cell.items()) {
+							this.door = door;
+							break;
+						}
+					}
+				}
+			}
+			
+			if (leastGasPoint != null && this.door != null) {
+				pointToMoveTo = this.getGrid().getLocation(this.door);
+			} else if (this.doctorToFollow == null || this.doctorToFollow.isDead()) {
 				pointToMoveTo = leastGasPoint;
 			} else if (leastGasPoint != null) {
 				pointToMoveTo = this.getGrid().getLocation(this.doctorToFollow);
@@ -73,4 +100,23 @@ public class Patient extends Human {
 		}
 		return pointWithLeastGas;
 	}
+	
+	protected void moveTowards(GridPoint pt) {
+		super.moveTowards(pt);
+		
+		if (this.door != null) {
+			GridPoint currentPt = this.getGrid().getLocation(this);
+			GridCellNgh<Door> doorNghCreator = new GridCellNgh<Door>(this.getGrid(), currentPt, Door.class, 0, 0);
+			List<GridCell<Door>> doorGridCells = doorNghCreator.getNeighborhood(true);
+			GridPoint doorPt = this.getGrid().getLocation(this.door);
+			if (doorGridCells.contains(doorPt)) {
+				this.exited = true;
+				this.doctorToFollow.stopFollowing();
+				this.doctorToFollow = null;
+				this.door = null;
+				System.out.println("Patient exited");
+			}
+		}
+	}
 }
+ 
