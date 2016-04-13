@@ -1,5 +1,6 @@
 package bitspls.evacuation.agents;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import bitspls.evacuation.Door;
@@ -17,6 +18,7 @@ import repast.simphony.util.SimUtilities;
 
 public class Patient extends Human {
 	private static final int SPEED = 2;
+	private double panic = 0.5;
 	
 	private PatientMode movementMode;
 	private Doctor doctorToFollow;
@@ -121,6 +123,129 @@ public class Patient extends Human {
 				System.out.println("Patient exited");
 			}
 		}
+	}
+		
+	public Boolean shouldFollowDoctorAgent(Doctor doctor) {
+		double probabilityOfFollowingDoctor = 0.4*doctor.getCharisma() + 0.6*getPanic();
+		return randomFollowGenerator(probabilityOfFollowingDoctor);
+	}
+	
+	public boolean randomFollowGenerator(double probabilityTrue)
+	{
+	    return Math.random() >= 1.0 - probabilityTrue;
+	}
+	
+	public double calculateNewPanicLevel() {
+		return (0.4 * getPanic()) + (0.3 * calculatePatientsPanicFactor()) + (0.3 * calculateGasParticleFactor() );
+	}
+	
+	private List<GasParticle> findGasAgentsInRadiusOfKnowledge () {
+		int radiusOfKnowledge = getRadiusOfKnowledge();
+		GridPoint location = getGrid().getLocation(this);
+		int xLocation = location.getX();
+		int yLocation = location.getY();
+		
+		List<GasParticle> gasAgentsInRadius = new ArrayList<GasParticle>();
+		
+		for(int i = xLocation - radiusOfKnowledge; i < xLocation + radiusOfKnowledge; i++) {
+			for(int j = yLocation - radiusOfKnowledge; j < yLocation + radiusOfKnowledge; j++) {
+				if(i != xLocation || j != yLocation) {
+					for (Object obj : getGrid().getObjectsAt(i, j)) {
+						if (obj instanceof GasParticle) {
+							gasAgentsInRadius.add((GasParticle) obj);
+						}
+					}
+				}
+			}
+		}
+		return gasAgentsInRadius;
+	}
+	
+	private List<Patient> findPatientAgentsInRadiusOfKnowledge() {
+		int radiusOfKnowledge = getRadiusOfKnowledge();
+		GridPoint location = getGrid().getLocation(this);
+		int xLocation = location.getX();
+		int yLocation = location.getY();
+		
+		List<Patient> patientsInRadius = new ArrayList<Patient>();
+		
+		for(int i = xLocation - radiusOfKnowledge; i < xLocation + radiusOfKnowledge; i++) {
+			for(int j = yLocation - radiusOfKnowledge; j < yLocation + radiusOfKnowledge; j++) {
+				if(i != xLocation || j != yLocation) {
+					for (Object obj : getGrid().getObjectsAt(i, j)) {
+						if (obj instanceof Patient) {
+							patientsInRadius.add((Patient) obj);
+						}
+					}
+				}
+			}
+		}
+		return patientsInRadius;
+	}
+	
+	private double calculatePatientsPanicFactor() {
+		List<Patient> patients = findPatientAgentsInRadiusOfKnowledge();
+		return calculateSurroundingPatientsPanicFactor(patients)/calculateWorstCaseScenario();
+	}
+	
+	private double calculateSurroundingPatientsPanicFactor(List<Patient> patients) {
+		GridPoint location = getGrid().getLocation(this);
+		double totalPatientFactor = 0.0;
+		
+		for(Patient patient: patients) {
+			GridPoint pt = getGrid().getLocation(patient);
+			double distance = getGrid().getDistance(location, pt);
+			totalPatientFactor += patient.getPanic()/distance;
+		}
+		
+		return totalPatientFactor;
+	}
+	
+	private double calculateWorstCaseScenario() {	
+		int radiusOfKnowledge = getRadiusOfKnowledge();
+		GridPoint location = getGrid().getLocation(this);
+		int xLocation = location.getX();
+		int yLocation = location.getY();
+		
+		double total = 0.0;
+		
+		for(int i = xLocation - radiusOfKnowledge; i < xLocation + radiusOfKnowledge; i++) {
+			for(int j = yLocation - radiusOfKnowledge; j < yLocation + radiusOfKnowledge; j++) {
+				if(i != xLocation || j != yLocation) {
+					GridPoint currentPt = new GridPoint(i, j);
+					double distance = getGrid().getDistance(location, currentPt);
+					total += 1/distance;
+				}
+			}
+		}
+		
+		return total;
+	}
+	
+	private double calculateGasParticleFactor() {
+		List<GasParticle> surroundingGas = findGasAgentsInRadiusOfKnowledge();
+		return calculateSurroundingGasParticleFactor(surroundingGas)/calculateWorstCaseScenario();
+	}
+	
+	private double calculateSurroundingGasParticleFactor(List<GasParticle> gasAgents) {
+		GridPoint location = getGrid().getLocation(this);
+		double totalGasFactor = 0.0;
+		
+		for(GasParticle gas: gasAgents) {
+			GridPoint pt = getGrid().getLocation(gas);
+			double distance = getGrid().getDistance(location, pt);
+			totalGasFactor += 1/distance;
+		}
+		
+		return totalGasFactor;
+	}
+	
+	public double getPanic() {
+		return this.panic;
+	}
+	
+	public void setPanic(double panic) {
+		this.panic = panic;
 	}
 	
 	enum PatientMode {
