@@ -41,8 +41,6 @@ public class Patient extends Human {
 	@ScheduledMethod(start = 1, interval = 1)
 	public void run() {
 		if (!isDead() && !this.exited) {
-			GridPoint pt = this.getGrid().getLocation(this);
-
 			this.setPanic(this.calculateNewPanicLevel());
 			
 			if (this.doctorToFollow == null || this.door != null) {
@@ -55,26 +53,22 @@ public class Patient extends Human {
 			}
 			
 			if (this.movementMode != PatientMode.APPROACH_DOOR) {
-				GridCellNgh<Door> doorNghCreator = new GridCellNgh<Door>(this.getGrid(), pt, Door.class, this.getRadiusOfKnowledge(), this.getRadiusOfKnowledge());
-				List<GridCell<Door>> doorGridCells = doorNghCreator.getNeighborhood(true);
-				
-				for (GridCell<Door> cell : doorGridCells) {
-					if (cell.size() > 0) {
-						for (Door door : cell.items()) {
-							this.door = door;
-							this.movementMode = PatientMode.APPROACH_DOOR;
-							break;
-						}
-					}
+				Door closestDoor = findClosestDoor();
+				if (closestDoor != null) {
+					this.door = closestDoor;
+					this.movementMode = PatientMode.APPROACH_DOOR;
 				}
 			}
 			
-			GridPoint pointToMoveTo = findNextPointToMoveTo();
-			if (pointToMoveTo != null) {
-				moveTowards(pointToMoveTo);
-			} else {
-				this.kill();
-			}
+			determineNextAction(findNextPointToMoveTo());
+		}
+	}
+	
+	private void determineNextAction(GridPoint pointToMoveTo) {
+		if (pointToMoveTo != null) {
+			moveTowards(pointToMoveTo);
+		} else {
+			this.kill();
 		}
 	}
 	
@@ -138,6 +132,28 @@ public class Patient extends Human {
 	
 	public double calculateNewPanicLevel() {
 		return (0.4 * getPanic()) + (0.3 * calculatePatientsPanicFactor()) + (0.3 * calculateGasParticleFactor() );
+	}
+	
+	private Door findClosestDoor() {
+		GridPoint currentLocation = this.getGrid().getLocation(this);
+		GridCellNgh<Door> doorNghCreator = new GridCellNgh<Door>(this.getGrid(), currentLocation, Door.class, this.getRadiusOfKnowledge(), this.getRadiusOfKnowledge());
+		List<GridCell<Door>> doorGridCells = doorNghCreator.getNeighborhood(true);
+		
+		double minimumDistance = Double.POSITIVE_INFINITY;
+		Door closestDoor = null;
+		
+		for (GridCell<Door> cell : doorGridCells) {
+			if (cell.size() > 0) {
+				for (Door door : cell.items()) {
+					double distance = getGrid().getDistance(currentLocation, getGrid().getLocation(door));	
+					if (distance < minimumDistance) {
+						closestDoor = door;
+					}
+				}
+			}
+		}
+		
+		return closestDoor;
 	}
 	
 	private Doctor findDoctorWithMaxCharisma() {
