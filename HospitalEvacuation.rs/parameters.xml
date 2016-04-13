@@ -1,41 +1,41 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <parameters>
-				<parameter name="randomSeed" displayName="Default Random Seed" type="int" 
-						defaultValue="__NULL__"
-						isReadOnly="false" 
-						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
-									
-				/>
-				<parameter name="door_count" displayName="Doors" type="int" 
-						defaultValue="5" 
-						isReadOnly="false" 
-						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
-									
-				/>
-				<parameter name="doctor_count" displayName="Doctors" type="int" 
-						defaultValue="20" 
-						isReadOnly="false" 
-						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
-									
-				/>
-				<parameter name="starting_panic" displayName="Starting Panic Level" type="double" 
-						defaultValue="0.5" 
-						isReadOnly="false" 
-						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter "
-									
-				/>
-				<parameter name="patient_weight" displayName="Patient Panic Weight" type="double" 
-						defaultValue="0.2" 
-						isReadOnly="false" 
-						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter "
-									
-				/>
-				<parameter name="gas_weight" displayName="Gas Panic Weight" type="double" 
-						defaultValue="0.3" 
-						isReadOnly="false" 
-						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter "
-									
-				/>
-		</parameters>
-
-
+		<parameter name="randomSeed" displayName="Default Random Seed" type="int" 
+				defaultValue="__NULL__"
+				isReadOnly="false" 
+				converter="repast.simphony.parameter.StringConverterFactory$IntConverter"				
+		/>
+		<parameter name="door_count" displayName="Door Count" type="int" 
+				defaultValue="5" 
+				isReadOnly="false" 
+				converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+		/>
+		<parameter name="doctor_count" displayName="Doctors" type="int" 
+				defaultValue="20" 
+				isReadOnly="false" 
+				converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+		/>
+		<parameter name="patient_count" displayName="Patient Count" type="int" 
+				defaultValue="100" 
+				isReadOnly="false" 
+				converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+		/>
+		<parameter name="starting_panic" displayName="Starting Panic Level" type="double" 
+				defaultValue="0.5" 
+				isReadOnly="false" 
+				converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+							
+		/>
+		<parameter name="patient_weight" displayName="Patient Panic Weight" type="double" 
+				defaultValue="0.2" 
+				isReadOnly="false" 
+				converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+							
+		/>
+		<parameter name="gas_weight" displayName="Gas Panic Weight" type="double" 
+				defaultValue="0.3" 
+				isReadOnly="false" 
+				converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+							
+		/>
+</parameters>

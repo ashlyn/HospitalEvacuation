@@ -41,7 +41,7 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 		Grid<Object> grid = gridFactory.createGrid("grid", context,
 				new GridBuilderParameters<Object>(new StickyBorders(),
 						new SimpleGridAdder<Object>(), true, new int[] {200, 150}, new int[] {0, 0}));
-		
+
 		int gasCount = 1;
 		for (int i = 0; i < gasCount; i++) {
 			context.add(new GasParticle(space, grid));
@@ -50,11 +50,11 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 		List<Door> doors = new ArrayList<Door>();
 		
 		double[][] doorLocations = new double[][]
-				{ new double[] { 80, 74.9 },
-				new double[] { 20, 74.9 },
-				new double[] { 99.9, 28 },
-				new double[] { 99.9, 27 },
-				new double[] { 57, 74.9 }};
+				{ new double[] { 80, 74 },
+				new double[] { 20, 74 },
+				new double[] { 99, 28 },
+				new double[] { 99, 27 },
+				new double[] { 57, 74 }};
 		
 		int doorCount = params.getInteger("door_count");
 		for (int i = 0; i < doorCount; i++) {

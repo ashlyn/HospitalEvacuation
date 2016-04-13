@@ -55,6 +55,7 @@ public class Patient extends Human {
 			if (this.doctorToFollow == null || this.door != null) {
 				Doctor targetDoctor = findDoctorWithMaxCharisma();
 				if(targetDoctor != null && shouldFollowDoctorAgent(targetDoctor)) {
+					System.out.println("Followed Doctor");
 					this.doctorToFollow = targetDoctor;
 					this.doctorToFollow.startFollowing();
 					this.movementMode = PatientMode.FOLLOW_DOCTOR;
@@ -131,6 +132,7 @@ public class Patient extends Human {
 
 	public boolean shouldFollowDoctorAgent(Doctor doctor) {
 		double probabilityOfFollowingDoctor = 0.4*doctor.getCharisma() + 0.6*(1 - getPanic());
+		System.out.println("Probability:  " + probabilityOfFollowingDoctor);
 		return randomFollowGenerator(probabilityOfFollowingDoctor);
 	}
 	

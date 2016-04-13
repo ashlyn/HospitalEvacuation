@@ -5,7 +5,6 @@ import java.util.List;
 
 import repast.simphony.context.Context;
 import repast.simphony.engine.environment.RunEnvironment;
-import repast.simphony.engine.schedule.Schedule;
 import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.query.space.grid.GridCell;
 import repast.simphony.query.space.grid.GridCellNgh;
@@ -30,10 +29,9 @@ public class GasParticle {
 	@ScheduledMethod(start = 1, interval = 1)
 	public void spawn() {
 		int ticks = (int) RunEnvironment.getInstance().getCurrentSchedule().getTickCount();
-		
+
 		if (!moved && ticks % 10 == 0) {
 		GridPoint pt = grid.getLocation(this);
-		
 			if (pt != null) {
 			
 				// use GridCellNgh class to create GridCells  for neighborhood
