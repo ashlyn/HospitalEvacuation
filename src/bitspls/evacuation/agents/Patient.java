@@ -50,16 +50,23 @@ public class Patient extends Human {
 				List<GridCell<Doctor>> doctorGridCells = doctorNghCreator.getNeighborhood(true);
 				SimUtilities.shuffle(doctorGridCells, RandomHelper.getUniform());
 				
-				
+				double maxCharisma = 0.0;
+				Doctor targetDoctor = null;
 				for (GridCell<Doctor> cell : doctorGridCells) {
 					if (cell.size() > 0) {
 						for (Doctor doc : cell.items()) {
-							this.doctorToFollow = doc;
-							this.doctorToFollow.startFollowing();
-							this.movementMode = PatientMode.FOLLOW_DOCTOR;
-							break;
+							if(doc.getCharisma() > maxCharisma) {
+								targetDoctor = doc;
+								maxCharisma = doc.getCharisma();
+							}
 						}
 					}
+				}
+				
+				if(shouldFollowDoctorAgent(targetDoctor)) {
+					this.doctorToFollow = targetDoctor;
+					this.doctorToFollow.startFollowing();
+					this.movementMode = PatientMode.FOLLOW_DOCTOR;
 				}
 			}
 			
