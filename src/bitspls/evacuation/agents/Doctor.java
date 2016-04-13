@@ -14,6 +14,7 @@ import repast.simphony.util.SimUtilities;
 
 public class Doctor extends Human {
 	private static final int SPEED = 1;
+	private double charisma;
 	
 	public Doctor(ContinuousSpace<Object> space, Grid<Object> grid) {
 		this.setSpace(space);
@@ -44,5 +45,13 @@ public class Doctor extends Human {
 				this.kill();
 			}
 		}
+	}
+	
+	public double getCharisma() {
+		return this.charisma;
+	}
+	
+	public void setCharisma(double charisma) {
+		this.charisma = charisma;
 	}
 }
