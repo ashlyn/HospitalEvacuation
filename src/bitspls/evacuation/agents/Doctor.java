@@ -71,7 +71,7 @@ public class Doctor extends Human {
 	
 	private void moveRandomly() {
 		GridPoint pt = this.getGrid().getLocation(this);
-		//GridPoint pointToMoveTo = super.findLeastGasPoint(pt);
+		GridPoint pointToMoveTo = super.findLeastGasPoint(pt);
 		
 		super.moveTowards(pointToMoveTo);
 	}
