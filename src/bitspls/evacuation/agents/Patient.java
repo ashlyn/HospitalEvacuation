@@ -18,6 +18,7 @@ import repast.simphony.util.SimUtilities;
 public class Patient extends Human {
 	private static final int SPEED = 2;
 	
+	private PatientMode movementMode;
 	private Doctor doctorToFollow;
 	private Door door;
 	private boolean exited;
@@ -28,6 +29,7 @@ public class Patient extends Human {
 		this.setDead(false);
 		this.setRadiusOfKnowledge(10);
 		this.setSpeed(SPEED);
+		this.movementMode = PatientMode.AVOID_GAS;
 		this.doctorToFollow = null;
 		this.door = null;
 		this.exited = false;
@@ -51,13 +53,14 @@ public class Patient extends Human {
 						for (Doctor doc : cell.items()) {
 							this.doctorToFollow = doc;
 							this.doctorToFollow.startFollowing();
+							this.movementMode = PatientMode.FOLLOW_DOCTOR;
 							break;
 						}
 					}
 				}
 			}
 			
-			if (this.door == null) {
+			if (this.movementMode != PatientMode.APPROACH_DOOR) {
 				GridCellNgh<Door> doorNghCreator = new GridCellNgh<Door>(this.getGrid(), pt, Door.class, this.getRadiusOfKnowledge(), this.getRadiusOfKnowledge());
 				List<GridCell<Door>> doorGridCells = doorNghCreator.getNeighborhood(true);
 				
@@ -65,18 +68,19 @@ public class Patient extends Human {
 					if (cell.size() > 0) {
 						for (Door door : cell.items()) {
 							this.door = door;
+							this.movementMode = PatientMode.APPROACH_DOOR;
 							break;
 						}
 					}
 				}
 			}
 			
-			if (leastGasPoint != null && this.door != null) {
+			if (this.movementMode == PatientMode.APPROACH_DOOR) {
 				pointToMoveTo = this.getGrid().getLocation(this.door);
-			} else if (this.doctorToFollow == null || this.doctorToFollow.isDead()) {
-				pointToMoveTo = leastGasPoint;
-			} else if (leastGasPoint != null) {
+			} else if (this.movementMode == PatientMode.FOLLOW_DOCTOR && !this.doctorToFollow.isDead()) {
 				pointToMoveTo = this.getGrid().getLocation(this.doctorToFollow);
+			} else if (leastGasPoint != null) {
+				pointToMoveTo = leastGasPoint;
 			}
 			
 			if (pointToMoveTo != null) {
@@ -117,6 +121,12 @@ public class Patient extends Human {
 				System.out.println("Patient exited");
 			}
 		}
+	}
+	
+	enum PatientMode {
+		AVOID_GAS,
+		FOLLOW_DOCTOR,
+		APPROACH_DOOR
 	}
 }
  
