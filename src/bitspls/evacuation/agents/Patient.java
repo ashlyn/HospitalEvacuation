@@ -45,7 +45,7 @@ public class Patient extends Human {
 			GridPoint pointToMoveTo = null;
 			GridPoint leastGasPoint = findLeastGasPoint(pt);
 			
-			if (this.doctorToFollow == null || this.door != null) {
+			if (this.doctorToFollow == null) {
 				GridCellNgh<Doctor> doctorNghCreator = new GridCellNgh<Doctor>(this.getGrid(), pt, Doctor.class, this.getRadiusOfKnowledge(), this.getRadiusOfKnowledge());
 				List<GridCell<Doctor>> doctorGridCells = doctorNghCreator.getNeighborhood(true);
 				SimUtilities.shuffle(doctorGridCells, RandomHelper.getUniform());
@@ -63,7 +63,7 @@ public class Patient extends Human {
 					}
 				}
 				
-				if(shouldFollowDoctorAgent(targetDoctor)) {
+				if(targetDoctor != null && shouldFollowDoctorAgent(targetDoctor)) {
 					this.doctorToFollow = targetDoctor;
 					this.doctorToFollow.startFollowing();
 					this.movementMode = PatientMode.FOLLOW_DOCTOR;
@@ -133,7 +133,7 @@ public class Patient extends Human {
 		}
 	}
 
-	public Boolean shouldFollowDoctorAgent(Doctor doctor) {
+	public boolean shouldFollowDoctorAgent(Doctor doctor) {
 		double probabilityOfFollowingDoctor = 0.4*doctor.getCharisma() + 0.6*(1 - getPanic());
 		return randomFollowGenerator(probabilityOfFollowingDoctor);
 	}
