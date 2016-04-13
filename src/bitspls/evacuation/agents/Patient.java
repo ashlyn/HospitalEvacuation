@@ -48,12 +48,10 @@ public class Patient extends Human {
 
 			if (this.doctorToFollow == null || this.door != null) {
 				Doctor targetDoctor = findDoctorWithMaxCharisma();
-				if (targetDoctor != null) {
-					if(shouldFollowDoctorAgent(targetDoctor)) {
-						this.doctorToFollow = targetDoctor;
-						this.doctorToFollow.startFollowing();
-						this.movementMode = PatientMode.FOLLOW_DOCTOR;
-					}
+				if(targetDoctor != null && shouldFollowDoctorAgent(targetDoctor)) {
+					this.doctorToFollow = targetDoctor;
+					this.doctorToFollow.startFollowing();
+					this.movementMode = PatientMode.FOLLOW_DOCTOR;
 				}
 			}
 			
