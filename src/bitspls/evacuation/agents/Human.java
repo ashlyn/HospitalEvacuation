@@ -88,51 +88,43 @@ public abstract class Human {
 			
 				if (angleB >= 0 && angleB <= Math.PI / 8) {
 					// check between 315 and 90
-					if (checkIfGasInBounds(currentY, y - MOVEMENT_DISTANCE, y + MOVEMENT_DISTANCE, currentX,
-							x, x + MOVEMENT_DISTANCE, currentBestY, currentBestX, false, true)) {
+					if (checkIfGasInBounds(currentGasPoint, pt, angleB, currentY, currentX, currentBestY, currentBestX, false, true)) {
 						bestGasPoint = currentGasPoint;
 					}
 				} else if (angleB > Math.PI / 8 && angleB <= Math.PI / 4) {
 					// check between 0 and 135
-					if (checkIfGasInBounds(currentY, y, y + MOVEMENT_DISTANCE, currentX, x - MOVEMENT_DISTANCE,
-							x + MOVEMENT_DISTANCE, currentBestY, currentBestX, false, true)) {
+					if (checkIfGasInBounds(currentGasPoint, pt, angleB, currentY, currentX, currentBestY, currentBestX, false, true)) {
 						bestGasPoint = currentGasPoint;
 					}
 				} else if (angleB > Math.PI / 4 && angleB <= Math.PI * 3 / 4) {
 					// check between 45 and 180
-					if (checkIfGasInBounds(currentX, x - MOVEMENT_DISTANCE, x + MOVEMENT_DISTANCE,
-							currentY, y, y + MOVEMENT_DISTANCE, currentBestX, currentBestY, true, true)) {
+					if (checkIfGasInBounds(currentGasPoint, pt, angleB, currentX, currentY, currentBestX, currentBestY, true, true)) {
 						bestGasPoint = currentGasPoint;
 					}
 				} else if (angleB > Math.PI * 3 / 4 && angleB <= Math.PI) {
-					if (checkIfGasInBounds(currentX, x - MOVEMENT_DISTANCE, x, currentY,
-							y - MOVEMENT_DISTANCE, y + MOVEMENT_DISTANCE, currentBestX,
+					if (checkIfGasInBounds(currentGasPoint, pt, angleB, currentX, currentY, currentBestX,
 							currentBestY, true, true)) {
 						bestGasPoint = currentGasPoint;
 					}
 				} else if (angleB > Math.PI && angleB <= Math.PI * 5 / 4) {
 					// check between 135 and 270
-					if (checkIfGasInBounds(currentY, y - MOVEMENT_DISTANCE, y, currentX,
-							x - MOVEMENT_DISTANCE, x, currentBestY, currentBestX, true, false)) {
+					if (checkIfGasInBounds(currentGasPoint, pt, angleB, currentY, currentX, currentBestY, currentBestX, true, false)) {
 						bestGasPoint = currentGasPoint;
 					}
 				} else if (angleB > Math.PI * 5 / 4 && angleB <= Math.PI * 3 / 2) {
 					// check between 180 and 315
-					if (checkIfGasInBounds(currentY, y - MOVEMENT_DISTANCE, y, currentX,
-							x - MOVEMENT_DISTANCE, x + MOVEMENT_DISTANCE, currentBestY,
+					if (checkIfGasInBounds(currentGasPoint, pt, angleB, currentY, currentX, currentBestY,
 							currentBestX, true, false)) {
 						bestGasPoint = currentGasPoint;
 					}
 				} else if (angleB > Math.PI * 3 / 2 && angleB <= Math.PI * 7 / 4) {
 					// check between 225 and 0
-					if (checkIfGasInBounds(currentY, y - MOVEMENT_DISTANCE, y, currentX, x - MOVEMENT_DISTANCE,
-							x + MOVEMENT_DISTANCE, currentBestY, currentBestX, false, false)) {
+					if (checkIfGasInBounds(currentGasPoint, pt, angleB, currentX, currentY, currentBestX, currentBestY, false, false)) {
 						bestGasPoint = currentGasPoint;
 					}
 				} else {
 					// check between 270 and 45					
-					if (checkIfGasInBounds(currentY, y - MOVEMENT_DISTANCE, y, currentX,
-							x, x + MOVEMENT_DISTANCE, currentBestY, currentBestX, false, false)) {
+					if (checkIfGasInBounds(currentGasPoint, pt, angleB, currentX, currentY, currentBestX, currentBestY, false, false)) {
 						bestGasPoint = currentGasPoint;
 					}
 				}
@@ -142,14 +134,17 @@ public abstract class Human {
 		return bestGasPoint;
 	}
 	
-	private boolean checkIfGasInBounds(int height, double heightLower, double heightHigher, int length,
-			double lengthLower, double lengthHigher, int bestHeight, int bestLength, boolean highHeight,
+	private boolean checkIfGasInBounds(GridPoint gas, GridPoint human, double originalAngle,
+			int height, int length, int bestHeight, int bestLength, boolean highHeight,
 			boolean highLength) {
 		
 		boolean isInBounds = false;
 		
-		if (height >= heightLower && height <= heightHigher && length >= lengthLower
-				&& length <= lengthHigher) {
+		NdPoint humanPoint = new NdPoint(human.getX(), human.getY());
+		NdPoint gasPoint = new NdPoint(gas.getX(), gas.getY());
+		double angle = SpatialMath.calcAngleFor2DMovement(space, humanPoint, gasPoint);
+		
+		if (angle >= originalAngle - (Math.PI / 2) && angle <= originalAngle + (Math.PI / 2)) {
 			 
 			if (highHeight && (height > bestHeight) || (!highHeight && height < bestHeight)) {
 				isInBounds = true;
