@@ -16,6 +16,8 @@ public class Doctor extends Human {
 	private boolean nearDoor;
 	private int stepsTakenSinceDoor;
 	private boolean shouldGoBackToDoor;
+	private int followers;
+	private double charisma;
 	
 	public Doctor(ContinuousSpace<Object> space, Grid<Object> grid) {
 		this.setSpace(space);
@@ -27,6 +29,7 @@ public class Doctor extends Human {
 		this.nearDoor = false;
 		this.stepsTakenSinceDoor = 0;
 		this.shouldGoBackToDoor = false;
+		this.followers = 0;
 	}
 	
 	public void addDoor(NdPoint doorPoint) {
@@ -90,5 +93,25 @@ public class Doctor extends Human {
 		
 		
 		return null;
+	}
+	
+	public void startFollowing() {
+		this.followers++;
+	}
+	
+	public void stopFollowing() {
+		this.followers--;
+	}
+	
+	public int getFollowers() {
+		return this.followers;
+	}
+
+	public double getCharisma() {
+		return this.charisma;
+	}
+	
+	public void setCharisma(double charisma) {
+		this.charisma = charisma;
 	}
 }

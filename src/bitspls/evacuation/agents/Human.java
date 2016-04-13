@@ -145,7 +145,7 @@ public abstract class Human {
 		return isInBounds;
 	}
 	
-	protected boolean isDead() {
+	public boolean isDead() {
 		return this.dead;
 	}
 	
