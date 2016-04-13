@@ -43,7 +43,7 @@ public abstract class Human {
 				} else {
 					NdPoint point = new NdPoint(gasToAvoid.getX(), gasToAvoid.getY());
 					angle = SpatialMath.calcAngleFor2DMovement(space, myPoint, point);
-					angle -= (Math.PI / 2);
+					angle -= (Math.PI * 3 / 4);
 				}
 			}
 			
@@ -60,7 +60,7 @@ public abstract class Human {
 	private GridPoint gasInWay(double angleB) {
 		GridPoint pt = this.getGrid().getLocation(this);
 		
-		GridCellNgh<GasParticle> nghCreator = new GridCellNgh<GasParticle>(this.getGrid(), pt, GasParticle.class, 2, 2);
+		GridCellNgh<GasParticle> nghCreator = new GridCellNgh<GasParticle>(this.getGrid(), pt, GasParticle.class, 3, 3);
 		
 		List<GridCell<GasParticle>> gridCells = nghCreator.getNeighborhood(true);
 

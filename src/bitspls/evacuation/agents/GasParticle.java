@@ -31,7 +31,7 @@ public class GasParticle {
 		int ticks = (int) RunEnvironment.getInstance().getCurrentSchedule().getTickCount();
 		
 		// get grid location of this Gas particle
-		if (!moved && ticks % 5 == 0) {
+		if (!moved && ticks % 10 == 0) {
 		GridPoint pt = grid.getLocation(this);
 			if (pt != null) {
 			
