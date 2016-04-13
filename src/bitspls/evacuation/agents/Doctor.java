@@ -3,21 +3,22 @@ package bitspls.evacuation.agents;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.util.Pair;
 import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.relogo.Utility;
+import repast.simphony.space.SpatialMath;
 import repast.simphony.space.continuous.ContinuousSpace;
 import repast.simphony.space.continuous.NdPoint;
 import repast.simphony.space.grid.Grid;
 import repast.simphony.space.grid.GridPoint;
 
 public class Doctor extends Human {
+	private DoctorMode doctorMode;
 	private static final int SPEED = 1;
 	private List<NdPoint> doorPoints;
-	private boolean nearDoor;
-	private int stepsTakenSinceDoor;
-	private boolean shouldGoBackToDoor;
 	private int followers;
 	private double charisma;
+	private int stepsTakenAwayFromDoor;
 	
 	public Doctor(ContinuousSpace<Object> space, Grid<Object> grid) {
 		this.setSpace(space);
@@ -26,25 +27,20 @@ public class Doctor extends Human {
 		this.setRadiusOfKnowledge(15);
 		this.setSpeed(SPEED);
 		this.doorPoints = new ArrayList<>();
-		this.nearDoor = false;
-		this.stepsTakenSinceDoor = 0;
-		this.shouldGoBackToDoor = false;
 		this.followers = 0;
 		this.charisma = .5;
+		this.doctorMode = DoctorMode.DOOR_SEEK;
+		this.stepsTakenAwayFromDoor = 0;
 	}
 	
 	public void addDoor(NdPoint doorPoint) {
 		this.doorPoints.add(doorPoint);
 	}
 	
-	public void setShouldGoBackToDoor(boolean shouldGoBackToDoor) {
-		this.shouldGoBackToDoor = shouldGoBackToDoor;
-	}
-	
 	@ScheduledMethod(start = 1, interval = SPEED)
 	public void run() {
 		if (!isDead()) {
-			if (nearDoor || shouldGoBackToDoor) {
+			if (doctorMode == DoctorMode.PATIENT_SEEK) {
 				findPatients();
 			} else {
 				moveTowardsDoor();
@@ -53,18 +49,53 @@ public class Doctor extends Human {
 	}
 	
 	private void findPatients() {
-		GridPoint pt = this.getGrid().getLocation(this);
-		
-		GridPoint nextLocation = findNextLocation();
-		
-		stepsTakenSinceDoor++;
-		
-		if (stepsTakenSinceDoor > 10) {
-			nearDoor = false;
+		if (stepsTakenAwayFromDoor < 30) {
+			moveAwayFromDoor();
+		} else {
+			moveRandomly();
 		}
 	}
 	
+	private void moveRandomly() {
+		GridPoint pt = this.getGrid().getLocation(this);
+		GridPoint pointToMoveTo = super.findLeastGasPoint(pt);
+		
+		super.moveTowards(pointToMoveTo);
+	}
+	
+	private void moveAwayFromDoor() {
+		this.stepsTakenAwayFromDoor++;
+		Pair<Double, GridPoint> distancePointPair = findClosestDoor();
+		GridPoint doorLocation = distancePointPair.getValue();
+		
+		NdPoint myPoint = getSpace().getLocation(this);
+		NdPoint otherPoint = new NdPoint(doorLocation.getX(), doorLocation.getY());
+		double angleAwayFromDoor = SpatialMath.calcAngleFor2DMovement(getSpace(), myPoint, otherPoint);
+		
+		angleAwayFromDoor -= angleAwayFromDoor > Math.PI ? Math.PI : -Math.PI; 
+		
+		move(angleAwayFromDoor);
+	}
+	
 	private void moveTowardsDoor() {
+		Pair<Double, GridPoint> distancePointPair = findClosestDoor();
+		
+		double closestDoorDistance = distancePointPair.getKey();
+		GridPoint closestDoorPoint = distancePointPair.getValue();
+		
+		if (closestDoorDistance < 3) {
+			doctorMode = DoctorMode.PATIENT_SEEK;
+			this.stepsTakenAwayFromDoor = 0;
+		}
+		
+		if (closestDoorPoint != null) {
+			moveTowards(closestDoorPoint);
+		} else {
+			this.kill();
+		}
+	}
+	
+	private Pair<Double, GridPoint> findClosestDoor() {
 		GridPoint pt = this.getGrid().getLocation(this);
 		
 		double closestDoorDistance = Double.POSITIVE_INFINITY;
@@ -79,15 +110,7 @@ public class Doctor extends Human {
 		}
 		GridPoint closestDoorPoint = Utility.ndPointToGridPoint(closestDoor);
 		
-		if (closestDoorDistance < 5) {
-			//nearDoor = true;
-		}
-		
-		if (closestDoorPoint != null) {
-			moveTowards(closestDoorPoint);
-		} else {
-			this.kill();
-		}
+		return new Pair<Double, GridPoint>(closestDoorDistance, closestDoorPoint);
 	}
 	
 	private GridPoint findNextLocation() {
@@ -98,6 +121,7 @@ public class Doctor extends Human {
 	
 	public void startFollowing() {
 		this.followers++;
+		doctorMode = DoctorMode.DOOR_SEEK;
 	}
 	
 	public void stopFollowing() {
@@ -114,5 +138,11 @@ public class Doctor extends Human {
 	
 	public void setCharisma(double charisma) {
 		this.charisma = charisma;
+	}
+	
+	public enum DoctorMode {
+		DOOR_SEEK,
+		PATIENT_SEEK,
+		ESCAPE
 	}
 }

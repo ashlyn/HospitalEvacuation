@@ -4,11 +4,13 @@ import java.util.List;
 
 import repast.simphony.query.space.grid.GridCell;
 import repast.simphony.query.space.grid.GridCellNgh;
+import repast.simphony.random.RandomHelper;
 import repast.simphony.space.SpatialMath;
 import repast.simphony.space.continuous.ContinuousSpace;
 import repast.simphony.space.continuous.NdPoint;
 import repast.simphony.space.grid.Grid;
 import repast.simphony.space.grid.GridPoint;
+import repast.simphony.util.SimUtilities;
 
 public abstract class Human {
 	private static final double MOVEMENT_DISTANCE = 1;
@@ -53,10 +55,24 @@ public abstract class Human {
 		}
 	}
 	
-	private void move(double angle) {
+	protected void move(double angle) {
 		space.moveByVector(this, MOVEMENT_DISTANCE, angle, 0);
 		NdPoint point = space.getLocation(this);
 		grid.moveTo(this, (int)point.getX(), (int)point.getY());
+	}
+	
+	protected GridPoint findLeastGasPoint(GridPoint pt) {
+		GridCellNgh<GasParticle> nghCreator = new GridCellNgh<GasParticle>(this.getGrid(), pt, GasParticle.class, this.getRadiusOfKnowledge(), this.getRadiusOfKnowledge());
+		List<GridCell<GasParticle>> gridCells = nghCreator.getNeighborhood(true);
+		SimUtilities.shuffle(gridCells, RandomHelper.getUniform());
+		
+		GridPoint pointWithLeastGas = null;
+		for (GridCell<GasParticle> cell : gridCells) {
+			if (cell.size() == 0) {
+				pointWithLeastGas = cell.getPoint();
+			}
+		}
+		return pointWithLeastGas;
 	}
 	
 	private GridPoint gasInWay(double angleB) {
