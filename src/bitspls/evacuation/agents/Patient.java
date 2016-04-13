@@ -42,27 +42,11 @@ public class Patient extends Human {
 	public void run() {
 		if (!isDead() && !this.exited) {
 			GridPoint pt = this.getGrid().getLocation(this);
-			GridPoint pointToMoveTo = null;
-			GridPoint leastGasPoint = findLeastGasPoint(pt);
+
+			this.setPanic(this.calculateNewPanicLevel());
 			
 			if (this.doctorToFollow == null || this.door != null) {
-				GridCellNgh<Doctor> doctorNghCreator = new GridCellNgh<Doctor>(this.getGrid(), pt, Doctor.class, this.getRadiusOfKnowledge(), this.getRadiusOfKnowledge());
-				List<GridCell<Doctor>> doctorGridCells = doctorNghCreator.getNeighborhood(true);
-				SimUtilities.shuffle(doctorGridCells, RandomHelper.getUniform());
-				
-				double maxCharisma = 0.0;
-				Doctor targetDoctor = null;
-				for (GridCell<Doctor> cell : doctorGridCells) {
-					if (cell.size() > 0) {
-						for (Doctor doc : cell.items()) {
-							if(doc.getCharisma() > maxCharisma) {
-								targetDoctor = doc;
-								maxCharisma = doc.getCharisma();
-							}
-						}
-					}
-				}
-				
+				Doctor targetDoctor = findDoctorWithMaxCharisma();
 				if(shouldFollowDoctorAgent(targetDoctor)) {
 					this.doctorToFollow = targetDoctor;
 					this.doctorToFollow.startFollowing();
@@ -85,20 +69,29 @@ public class Patient extends Human {
 				}
 			}
 			
-			if (this.movementMode == PatientMode.APPROACH_DOOR) {
-				pointToMoveTo = this.getGrid().getLocation(this.door);
-			} else if (this.movementMode == PatientMode.FOLLOW_DOCTOR && !this.doctorToFollow.isDead()) {
-				pointToMoveTo = this.getGrid().getLocation(this.doctorToFollow);
-			} else if (leastGasPoint != null) {
-				pointToMoveTo = leastGasPoint;
-			}
-			
+			GridPoint pointToMoveTo = findNextPointToMoveTo();
 			if (pointToMoveTo != null) {
 				moveTowards(pointToMoveTo);
 			} else {
 				this.kill();
 			}
 		}
+	}
+	
+	private GridPoint findNextPointToMoveTo() {
+		GridPoint currentLocation = this.getGrid().getLocation(this);
+		GridPoint leastGasPoint = findLeastGasPoint(currentLocation);
+		GridPoint pointToMoveTo = null;
+		
+		if (this.movementMode == PatientMode.APPROACH_DOOR) {
+			pointToMoveTo = this.getGrid().getLocation(this.door);
+		} else if (this.movementMode == PatientMode.FOLLOW_DOCTOR && !this.doctorToFollow.isDead()) {
+			pointToMoveTo = this.getGrid().getLocation(this.doctorToFollow);
+		} else if (leastGasPoint != null) {
+			pointToMoveTo = leastGasPoint;
+		}
+		
+		return pointToMoveTo;
 	}
 	
 	private GridPoint findLeastGasPoint(GridPoint pt) {
@@ -145,6 +138,28 @@ public class Patient extends Human {
 	
 	public double calculateNewPanicLevel() {
 		return (0.4 * getPanic()) + (0.3 * calculatePatientsPanicFactor()) + (0.3 * calculateGasParticleFactor() );
+	}
+	
+	private Doctor findDoctorWithMaxCharisma() {
+		GridPoint currentLocation = this.getGrid().getLocation(this);
+		GridCellNgh<Doctor> doctorNghCreator = new GridCellNgh<Doctor>(this.getGrid(), currentLocation, Doctor.class, this.getRadiusOfKnowledge(), this.getRadiusOfKnowledge());
+		List<GridCell<Doctor>> doctorGridCells = doctorNghCreator.getNeighborhood(true);
+		SimUtilities.shuffle(doctorGridCells, RandomHelper.getUniform());
+		
+		double maxCharisma = 0.0;
+		Doctor maxDoctor = null;
+		for (GridCell<Doctor> cell : doctorGridCells) {
+			if (cell.size() > 0) {
+				for (Doctor doc : cell.items()) {
+					if(doc.getCharisma() > maxCharisma) {
+						maxDoctor = doc;
+						maxCharisma = doc.getCharisma();
+					}
+				}
+			}
+		}
+		
+		return maxDoctor;
 	}
 	
 	private List<GasParticle> findGasAgentsInRadiusOfKnowledge () {
