@@ -88,107 +88,52 @@ public abstract class Human {
 			
 				if (angleB >= 0 && angleB <= Math.PI / 8) {
 					// check between 315 and 90
-					if (currentX <= x + MOVEMENT_DISTANCE &&
-							currentX >= x &&
-							(currentY <= y + MOVEMENT_DISTANCE ||
-							currentY >= y - MOVEMENT_DISTANCE)) {
-						
-						if (currentY < currentBestY || (currentX > currentBestX && currentY == currentBestY) || currentBestY == -1) {
-							currentBestY = currentY;
-							currentBestX = currentX;
-							bestGasPoint = currentGasPoint;
-						}
+					if (checkIfGasInBounds(currentY, y - MOVEMENT_DISTANCE, y + MOVEMENT_DISTANCE, currentX,
+							x, x + MOVEMENT_DISTANCE, currentBestY, currentBestX, false, true)) {
+						bestGasPoint = currentGasPoint;
 					}
 				} else if (angleB > Math.PI / 8 && angleB <= Math.PI / 4) {
 					// check between 0 and 135
-					if (currentX <= x + MOVEMENT_DISTANCE &&
-							currentX >= x - MOVEMENT_DISTANCE &&
-							(currentY <= y + MOVEMENT_DISTANCE ||
-							currentY >= y)) {
-						
-						if (currentY < currentBestY || (currentX > currentBestX && currentY == currentBestY) || currentBestY == -1) {
-							currentBestY = currentY;
-							currentBestX = currentX;
-							bestGasPoint = currentGasPoint;
-						}
+					if (checkIfGasInBounds(currentY, y, y + MOVEMENT_DISTANCE, currentX, x - MOVEMENT_DISTANCE,
+							x + MOVEMENT_DISTANCE, currentBestY, currentBestX, false, true)) {
+						bestGasPoint = currentGasPoint;
 					}
 				} else if (angleB > Math.PI / 4 && angleB <= Math.PI * 3 / 4) {
 					// check between 45 and 180
-					if (currentX <= x + MOVEMENT_DISTANCE &&
-							currentX >= x - MOVEMENT_DISTANCE &&
-							(currentY <= y + MOVEMENT_DISTANCE ||
-							currentY >= y)) {
-						
-						if (currentX > currentBestX || (currentY > currentBestY && currentX == currentBestX) || currentBestY == -1) {
-							currentBestY = currentY;
-							currentBestX = currentX;
-							bestGasPoint = currentGasPoint;
-						}
+					if (checkIfGasInBounds(currentX, x - MOVEMENT_DISTANCE, x + MOVEMENT_DISTANCE,
+							currentY, y, y + MOVEMENT_DISTANCE, currentBestX, currentBestY, true, true)) {
+						bestGasPoint = currentGasPoint;
 					}
 				} else if (angleB > Math.PI * 3 / 4 && angleB <= Math.PI) {
-					// check between 90 and 225
-					if (currentX <= x &&
-							currentX >= x - MOVEMENT_DISTANCE &&
-							(currentY <= y + MOVEMENT_DISTANCE ||
-							currentY >= y - MOVEMENT_DISTANCE)) {
-						
-						if (currentX > currentBestX || (currentY > currentBestY && currentX == currentBestX) || currentBestY == -1) {
-							currentBestY = currentY;
-							currentBestX = currentX;
-							bestGasPoint = currentGasPoint;
-						}
+					if (checkIfGasInBounds(currentX, x - MOVEMENT_DISTANCE, x, currentY,
+							y - MOVEMENT_DISTANCE, y + MOVEMENT_DISTANCE, currentBestX,
+							currentBestY, true, true)) {
+						bestGasPoint = currentGasPoint;
 					}
 				} else if (angleB > Math.PI && angleB <= Math.PI * 5 / 4) {
 					// check between 135 and 270
-					if (currentX <= x &&
-							currentX >= x - MOVEMENT_DISTANCE &&
-							(currentY <= y ||
-							currentY >= y - MOVEMENT_DISTANCE)) {
-						
-						if (currentY > currentBestY || (currentX < currentBestX && currentY == currentBestY) || currentBestY == -1) {
-							currentBestY = currentY;
-							currentBestX = currentX;
-							bestGasPoint = currentGasPoint;
-						}
+					if (checkIfGasInBounds(currentY, y - MOVEMENT_DISTANCE, y, currentX,
+							x - MOVEMENT_DISTANCE, x, currentBestY, currentBestX, true, false)) {
+						bestGasPoint = currentGasPoint;
 					}
 				} else if (angleB > Math.PI * 5 / 4 && angleB <= Math.PI * 3 / 2) {
 					// check between 180 and 315
-					if (currentX <= x + MOVEMENT_DISTANCE &&
-							currentX >= x - MOVEMENT_DISTANCE &&
-							(currentY <= y ||
-							currentY >= y - MOVEMENT_DISTANCE)) {
-						
-						if (currentY > currentBestY || (currentX < currentBestX && currentY == currentBestY) || currentBestY == -1) {
-							currentBestY = currentY;
-							currentBestX = currentX;
-							bestGasPoint = currentGasPoint;
-						}
+					if (checkIfGasInBounds(currentY, y - MOVEMENT_DISTANCE, y, currentX,
+							x - MOVEMENT_DISTANCE, x + MOVEMENT_DISTANCE, currentBestY,
+							currentBestX, true, false)) {
+						bestGasPoint = currentGasPoint;
 					}
 				} else if (angleB > Math.PI * 3 / 2 && angleB <= Math.PI * 7 / 4) {
 					// check between 225 and 0
-					if (currentX <= x + MOVEMENT_DISTANCE &&
-							currentX >= x - MOVEMENT_DISTANCE &&
-							(currentY <= y &&
-							currentY >= y - MOVEMENT_DISTANCE)) {
-						
-						if (currentY < currentBestY || (currentX < currentBestX && currentY == currentBestY) || currentBestY == -1) {
-							currentBestY = currentY;
-							currentBestX = currentX;
-							bestGasPoint = currentGasPoint;
-						}
+					if (checkIfGasInBounds(currentY, y - MOVEMENT_DISTANCE, y, currentX, x - MOVEMENT_DISTANCE,
+							x + MOVEMENT_DISTANCE, currentBestY, currentBestX, false, false)) {
+						bestGasPoint = currentGasPoint;
 					}
 				} else {
-					// check between 270 and 45
-					if (currentX <= x + MOVEMENT_DISTANCE &&
-							currentX >= x &&
-							currentY <= y &&
-							currentY >= y - MOVEMENT_DISTANCE) {
-						
-						if (currentY < currentBestY || (currentX < currentBestX && currentY == currentBestY) || currentBestY == -1) {
-							currentBestY = currentY;
-							currentBestX = currentX;
-							bestGasPoint = currentGasPoint;
-						}
+					// check between 270 and 45					
+					if (checkIfGasInBounds(currentY, y - MOVEMENT_DISTANCE, y, currentX,
+							x, x + MOVEMENT_DISTANCE, currentBestY, currentBestX, false, false)) {
+						bestGasPoint = currentGasPoint;
 					}
 				}
 			}
