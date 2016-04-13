@@ -8,7 +8,6 @@ import bitspls.evacuation.agents.Doctor;
 import bitspls.evacuation.agents.GasParticle;
 import bitspls.evacuation.agents.Human;
 import repast.simphony.engine.schedule.ScheduledMethod;
-import repast.simphony.engine.watcher.Watch;
 import repast.simphony.query.space.grid.GridCell;
 import repast.simphony.query.space.grid.GridCellNgh;
 import repast.simphony.random.RandomHelper;
@@ -45,7 +44,7 @@ public class Patient extends Human {
 
 			if (this.doctorToFollow == null || this.door != null) {
 				Doctor targetDoctor = findDoctorWithMaxCharisma();
-				if(shouldFollowDoctorAgent(targetDoctor)) {
+				if(targetDoctor != null && shouldFollowDoctorAgent(targetDoctor)) {
 					this.doctorToFollow = targetDoctor;
 					this.doctorToFollow.startFollowing();
 					this.movementMode = PatientMode.FOLLOW_DOCTOR;
