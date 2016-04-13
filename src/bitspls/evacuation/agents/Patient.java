@@ -13,6 +13,7 @@ import repast.simphony.query.space.grid.GridCellNgh;
 import repast.simphony.random.RandomHelper;
 import repast.simphony.space.continuous.ContinuousSpace;
 import repast.simphony.space.grid.Grid;
+import repast.simphony.space.grid.GridDimensions;
 import repast.simphony.space.grid.GridPoint;
 import repast.simphony.util.SimUtilities;
 
@@ -24,6 +25,7 @@ public class Patient extends Human {
 	private Door door;
 	private boolean exited;
 	private double panic;
+	private double worstCase;
 	
 	public Patient(ContinuousSpace<Object> space, Grid<Object> grid) {
 		this.setSpace(space);
@@ -32,6 +34,7 @@ public class Patient extends Human {
 		this.setRadiusOfKnowledge(10);
 		this.setSpeed(SPEED);
 		this.setPanic(0.5);
+		this.setWorstCase(calculateWorstCaseScenario());
 		this.movementMode = PatientMode.AVOID_GAS;
 		this.doctorToFollow = null;
 		this.door = null;
@@ -45,10 +48,12 @@ public class Patient extends Human {
 
 			if (this.doctorToFollow == null || this.door != null) {
 				Doctor targetDoctor = findDoctorWithMaxCharisma();
-				if(shouldFollowDoctorAgent(targetDoctor)) {
-					this.doctorToFollow = targetDoctor;
-					this.doctorToFollow.startFollowing();
-					this.movementMode = PatientMode.FOLLOW_DOCTOR;
+				if (targetDoctor != null) {
+					if(shouldFollowDoctorAgent(targetDoctor)) {
+						this.doctorToFollow = targetDoctor;
+						this.doctorToFollow.startFollowing();
+						this.movementMode = PatientMode.FOLLOW_DOCTOR;
+					}
 				}
 			}
 			
@@ -131,7 +136,7 @@ public class Patient extends Human {
 	}
 	
 	public double calculateNewPanicLevel() {
-		return (0.4 * getPanic()) + (0.3 * calculatePatientsPanicFactor()) + (0.3 * calculateGasParticleFactor() );
+		return (0.4 * getPanic()) + /*(0.3 * calculatePatientsPanicFactor())*/ + (0.3 * calculateGasParticleFactor() );
 	}
 	
 	private Door findClosestDoor() {
@@ -178,24 +183,22 @@ public class Patient extends Human {
 		return maxDoctor;
 	}
 	
-	private List<GasParticle> findGasAgentsInRadiusOfKnowledge () {
+	private List<GridCell<GasParticle>> findGasAgentsInRadiusOfKnowledge () {
 		int radiusOfKnowledge = getRadiusOfKnowledge();
 		GridPoint location = getGrid().getLocation(this);
 
 		GridCellNgh<GasParticle> nghCreator = new GridCellNgh<GasParticle>(getGrid(), location, GasParticle.class, radiusOfKnowledge, radiusOfKnowledge);
 		List<GridCell<GasParticle>> gridCells = nghCreator.getNeighborhood(true);
 		
-		List<GasParticle> gasAgentsInRadius = new ArrayList<GasParticle>();
+		List<GridCell<GasParticle>> gasAgentLocation = new ArrayList<GridCell<GasParticle>>();
 		
 		for (GridCell<GasParticle> cell : gridCells) {
-			for (Object obj: getGrid().getObjectsAt(cell.getPoint().getX(), cell.getPoint().getY())) {
-				if (obj instanceof GasParticle) {
-					gasAgentsInRadius.add((GasParticle) obj);
-				}
+			if(cell.size() > 0) {
+				gasAgentLocation.add(cell);
 			}
 		}
-		
-		return gasAgentsInRadius;
+
+		return gasAgentLocation;
 	}
 	
 	private List<Patient> findPatientAgentsInRadiusOfKnowledge() {
@@ -214,43 +217,54 @@ public class Patient extends Human {
 				}
 			}
 		}
-		
 		return patientsInRadius;
 	}
 	
 	private double calculatePatientsPanicFactor() {
 		List<Patient> patients = findPatientAgentsInRadiusOfKnowledge();
-		return calculateSurroundingPatientsPanicFactor(patients)/calculateWorstCaseScenario();
+		
+		double worstCase = getWorstCase();
+		if (worstCase != 0) {
+			return calculateSurroundingPatientsPanicFactor(patients)/worstCase;
+		}
+		else {
+			return 0;
+		}
 	}
 	
 	private double calculateSurroundingPatientsPanicFactor(List<Patient> patients) {
-		GridPoint location = getGrid().getLocation(this);
+		GridPoint currentLocation = getGrid().getLocation(this);
 		double totalPatientFactor = 0.0;
 		
 		for(Patient patient: patients) {
 			GridPoint pt = getGrid().getLocation(patient);
-			double distance = getGrid().getDistance(location, pt);
-			totalPatientFactor += patient.getPanic()/distance;
+			double distance = getGrid().getDistance(currentLocation, pt);
+			//System.out.println("distance: " + distance);
+			if (distance != 0) {
+				//System.out.println("panic: " + patient.getPanic());
+				totalPatientFactor += patient.getPanic()/distance;
+			}
+			//System.out.println("totalPatientFactor: " + totalPatientFactor);
 		}
 		
 		return totalPatientFactor;
 	}
 	
-	private double calculateWorstCaseScenario() {	
-		int radiusOfKnowledge = getRadiusOfKnowledge();
-		GridPoint location = getGrid().getLocation(this);
-		int xLocation = location.getX();
-		int yLocation = location.getY();
+	private double calculateWorstCaseScenario() {
+		GridDimensions dimensions = getGrid().getDimensions();
+		GridPoint center = new GridPoint(dimensions.getWidth()/2, dimensions.getHeight()/2);
 		
+		int radiusOfKnowledge = getRadiusOfKnowledge();
 		double total = 0.0;
 		
-		for(int i = xLocation - radiusOfKnowledge; i < xLocation + radiusOfKnowledge; i++) {
-			for(int j = yLocation - radiusOfKnowledge; j < yLocation + radiusOfKnowledge; j++) {
-				if(i != xLocation || j != yLocation) {
-					GridPoint currentPt = new GridPoint(i, j);
-					double distance = getGrid().getDistance(location, currentPt);
-					total += 1/distance;
-				}
+		GridCellNgh<Patient> nghCreator = new GridCellNgh<Patient>(getGrid(), center, Patient.class, radiusOfKnowledge, radiusOfKnowledge);
+		List<GridCell<Patient>> gridCells = nghCreator.getNeighborhood(false);
+
+		for (GridCell<Patient> cell : gridCells) {
+			GridPoint currentPt = cell.getPoint();
+			double distance = getGrid().getDistance(center, currentPt);
+			if (distance != 0) {
+				total += 1/distance;
 			}
 		}
 		
@@ -258,16 +272,16 @@ public class Patient extends Human {
 	}
 	
 	private double calculateGasParticleFactor() {
-		List<GasParticle> surroundingGas = findGasAgentsInRadiusOfKnowledge();
-		return calculateSurroundingGasParticleFactor(surroundingGas)/calculateWorstCaseScenario();
+		List<GridCell<GasParticle>> surroundingGas = findGasAgentsInRadiusOfKnowledge();
+		return calculateSurroundingGasParticleFactor(surroundingGas)/worstCase;
 	}
 	
-	private double calculateSurroundingGasParticleFactor(List<GasParticle> gasAgents) {
+	private double calculateSurroundingGasParticleFactor(List<GridCell<GasParticle>> gasAgents) {
 		GridPoint location = getGrid().getLocation(this);
 		double totalGasFactor = 0.0;
 		
-		for(GasParticle gas: gasAgents) {
-			GridPoint pt = getGrid().getLocation(gas);
+		for(GridCell<GasParticle> gas: gasAgents) {
+			GridPoint pt = gas.getPoint();
 			double distance = getGrid().getDistance(location, pt);
 			totalGasFactor += 1/distance;
 		}
@@ -281,6 +295,14 @@ public class Patient extends Human {
 	
 	public void setPanic(double panic) {
 		this.panic = panic;
+	}
+	
+	public double getWorstCase() {
+		return this.worstCase;
+	}
+	
+	public void setWorstCase(double worstCase) {
+		this.worstCase = worstCase;
 	}
 	
 	enum PatientMode {
