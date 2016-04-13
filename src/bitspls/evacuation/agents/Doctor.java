@@ -30,6 +30,7 @@ public class Doctor extends Human {
 		this.stepsTakenSinceDoor = 0;
 		this.shouldGoBackToDoor = false;
 		this.followers = 0;
+		this.charisma = .5;
 	}
 	
 	public void addDoor(NdPoint doorPoint) {

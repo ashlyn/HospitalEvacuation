@@ -41,7 +41,11 @@ public abstract class Human {
 				} else {
 					NdPoint point = new NdPoint(gasToAvoid.getX(), gasToAvoid.getY());
 					angle = SpatialMath.calcAngleFor2DMovement(space, myPoint, point);
-					angle -= (Math.PI * 3 / 4);
+					if ((angle <= Math.PI && angle >= 0) || (angle >= -2 * Math.PI && angle <= -Math.PI)) {
+						angle += (Math.PI * 3 / 4);
+					} else {
+						angle -= (Math.PI * 3 / 4);
+					}
 				}
 			}
 			

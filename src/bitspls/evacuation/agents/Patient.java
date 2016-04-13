@@ -55,6 +55,7 @@ public class Patient extends Human {
 				for (GridCell<Doctor> cell : doctorGridCells) {
 					if (cell.size() > 0) {
 						for (Doctor doc : cell.items()) {
+							System.out.println("Charisma:  " + doc.getCharisma());
 							if(doc.getCharisma() > maxCharisma) {
 								targetDoctor = doc;
 								maxCharisma = doc.getCharisma();
@@ -64,6 +65,7 @@ public class Patient extends Human {
 				}
 				
 				if(targetDoctor != null && shouldFollowDoctorAgent(targetDoctor)) {
+					System.out.println("Followed Doctor");
 					this.doctorToFollow = targetDoctor;
 					this.doctorToFollow.startFollowing();
 					this.movementMode = PatientMode.FOLLOW_DOCTOR;
@@ -135,6 +137,7 @@ public class Patient extends Human {
 
 	public boolean shouldFollowDoctorAgent(Doctor doctor) {
 		double probabilityOfFollowingDoctor = 0.4*doctor.getCharisma() + 0.6*(1 - getPanic());
+		System.out.println("Probability:  " + probabilityOfFollowingDoctor);
 		return randomFollowGenerator(probabilityOfFollowingDoctor);
 	}
 	
