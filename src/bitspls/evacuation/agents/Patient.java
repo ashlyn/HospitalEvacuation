@@ -42,7 +42,7 @@ public class Patient extends Human {
 	public void run() {
 		if (!isDead() && !this.exited) {
 			this.setPanic(this.calculateNewPanicLevel());
-			
+
 			if (this.doctorToFollow == null || this.door != null) {
 				Doctor targetDoctor = findDoctorWithMaxCharisma();
 				if(shouldFollowDoctorAgent(targetDoctor)) {
@@ -120,7 +120,7 @@ public class Patient extends Human {
 		}
 	}
 
-	public Boolean shouldFollowDoctorAgent(Doctor doctor) {
+	public boolean shouldFollowDoctorAgent(Doctor doctor) {
 		double probabilityOfFollowingDoctor = 0.4*doctor.getCharisma() + 0.6*(1 - getPanic());
 		return randomFollowGenerator(probabilityOfFollowingDoctor);
 	}
