@@ -24,7 +24,7 @@ public abstract class Human {
 		}
 	}
 	
-	protected boolean isDead() {
+	public boolean isDead() {
 		return this.dead;
 	}
 	
