@@ -17,6 +17,7 @@ public class Doctor extends Human {
 	private static final int SPEED = 1;
 	private List<NdPoint> doorPoints;
 	private int followers;
+	private double charisma;
 	
 	public Doctor(ContinuousSpace<Object> space, Grid<Object> grid) {
 		this.setSpace(space);
@@ -78,5 +79,13 @@ public class Doctor extends Human {
 	
 	public int getFollowers() {
 		return this.followers;
+	}
+
+	public double getCharisma() {
+		return this.charisma;
+	}
+	
+	public void setCharisma(double charisma) {
+		this.charisma = charisma;
 	}
 }
