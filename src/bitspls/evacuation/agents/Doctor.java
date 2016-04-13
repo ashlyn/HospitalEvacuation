@@ -25,6 +25,7 @@ public class Doctor extends Human {
 		this.setDead(false);
 		this.setRadiusOfKnowledge(15);
 		this.setSpeed(SPEED);
+		this.setCharisma(0.5);
 		this.doorPoints = new ArrayList<>();
 		this.followers = 0;
 	}
