@@ -3,6 +3,8 @@ package bitspls.evacuation;
 import java.util.ArrayList;
 import java.util.List;
 
+import bitspls.evacuation.agents.Doctor;
+import bitspls.evacuation.agents.Doctor.DoctorMode;
 import bitspls.evacuation.agents.GasParticle;
 import bitspls.evacuation.agents.Patient;
 import repast.simphony.context.Context;
@@ -45,7 +47,18 @@ public class Door {
     }
 
     @ScheduledMethod(start = 1, interval = 1)
-    public void allowPatientsToExit() {
+    public void allowPatientsOrDoctorsToExit() {
+        List<Patient> patients = findExitingPatients();
+        allowPatientsToExit(patients);
+        
+        List<Doctor> doctors = findExitingDoctors();
+        if(patients.size() == 0) {
+            allowDoctorsToExit(doctors);
+        }
+
+    }
+    
+    private List<Patient> findExitingPatients() {
         GridPoint pt = this.grid.getLocation(this);
         GridCellNgh<Patient> nghCreator = new GridCellNgh<Patient>(this.grid, pt, Patient.class, 1, 1);
         List<GridCell<Patient>> gridCells = nghCreator.getNeighborhood(true);
@@ -58,6 +71,28 @@ public class Door {
             }
         }
         
+        return patients;
+    }
+    
+    private List<Doctor> findExitingDoctors() {
+        GridPoint pt = this.grid.getLocation(this);
+        GridCellNgh<Doctor> nghCreator = new GridCellNgh<Doctor>(this.grid, pt, Doctor.class, 1, 1);
+        List<GridCell<Doctor>> gridCells = nghCreator.getNeighborhood(true);
+        SimUtilities.shuffle(gridCells, RandomHelper.getUniform());
+        
+        List<Doctor> doctors = new ArrayList<Doctor>();
+        for (GridCell<Doctor> cell : gridCells) {
+            for (Doctor d : cell.items()) {
+                if(d.getMode() == DoctorMode.ESCAPE) {
+                    doctors.add(d);
+                }
+            }
+        }
+        
+        return doctors;
+    }
+    
+    private void allowPatientsToExit(List<Patient> patients) {
         Context<Object> context = ContextUtils.getContext(this);
         if (patients.size() > 2) {
             SimUtilities.shuffle(patients, RandomHelper.getUniform());
@@ -68,6 +103,21 @@ public class Door {
         } else if (patients.size() > 0) {
             for (Patient p : patients) {
                 context.remove(p);
+            }
+        }
+    }
+    
+    private void allowDoctorsToExit(List<Doctor> doctors) {
+        Context<Object> context = ContextUtils.getContext(this);
+        if (doctors.size() > 2) {
+            SimUtilities.shuffle(doctors, RandomHelper.getUniform());
+            Doctor d = doctors.remove(0);
+            context.remove(d);
+            d = doctors.remove(0);
+            context.remove(d);
+        } else if (doctors.size() > 0) {
+            for (Doctor d : doctors) {
+                context.remove(d);
             }
         }
     }
