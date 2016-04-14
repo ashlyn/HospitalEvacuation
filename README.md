@@ -19,7 +19,7 @@ for the doctor charisma and starting patient panic levels. These parameters allo
 and will allow us to adjust the independent variables in our experiements. The list of parameters and their definitions are below.
 
 ## Parameters
-- Starting Panic: the starting panic level of patients at the beginning of the simulation (betwee 0 and 1)
+- Starting Panic: the starting panic level of patients at the beginning of the simulation (between 0 and 1)
 - Mean Panic: the average panic level of patients at the beginning of the simulation (between 0 and 1)
 - Threshold for overcrowding: number of patients that need to be near a door for the door to be considered 'overcrowded'
 - Doctors: number of doctor agents to spawn at the beginning of the simulation
