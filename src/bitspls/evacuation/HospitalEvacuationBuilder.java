@@ -57,13 +57,17 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 				new double[] { 99, 27 },
 				new double[] { 57, 74 }};
 		
-		int doorCount = params.getInteger("door_count");
-		for (int i = 0; i < doorCount; i++) {
-			Door door = new Door(space, grid);
-			context.add(door);
-			space.moveTo(door, doorLocations[i]);
-			doors.add(door);
-		}
+		int overcrowdingThreshold = params.getInteger("overcrowding_threshold");
+		int blockedThreshold = params.getInteger("blocked_threshold");
+        int doorRadius = params.getInteger("door_radius");
+        
+        int doorCount = params.getInteger("door_count");
+        for (int i = 0; i < doorCount; i++) {
+            Door door = new Door(space, grid, doorRadius, overcrowdingThreshold, blockedThreshold);
+            context.add(door);
+            space.moveTo(door, doorLocations[i]);
+            doors.add(door);
+        }
 		
 		Random r = new Random();
 		
@@ -135,9 +139,9 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 			}
 		}
 		
-		doctor.addDoor(closestDoor);
-		doctor.addDoor(secondClosestDoor);
-		doctor.addDoor(thirdClosestDoor);
+		doctor.addDoor(closestDoor, DoorPointEnum.AVAILABLE);
+		doctor.addDoor(secondClosestDoor, DoorPointEnum.AVAILABLE);
+		doctor.addDoor(thirdClosestDoor, DoorPointEnum.AVAILABLE);
 	}
 
 }
