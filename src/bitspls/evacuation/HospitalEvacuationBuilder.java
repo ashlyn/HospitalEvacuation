@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Random;
 
 import repast.simphony.context.Context;
-import repast.simphony.context.ContextListener;
 import repast.simphony.context.space.continuous.ContinuousSpaceFactory;
 import repast.simphony.context.space.continuous.ContinuousSpaceFactoryFinder;
 import repast.simphony.context.space.grid.GridFactory;
@@ -65,21 +64,21 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 		 */
 		List<Door> doors = new ArrayList<Door>();
 		double[][] doorLocations = new double[][]
-				{ new double[] { 80, 149.9 },
-				new double[] { 20, 149.9 },
-				new double[] { 199.9, 28 },
-				new double[] { 0.1, 27 },
-				new double[] { 57, 0.1 }};
+				{ new double[] { 0.1, 74 },
+				new double[] { 199.9, 74 },
+				new double[] { 66, 0.1 },
+				new double[] { 132, 0.1 },
+				new double[] { 66, 149.9 },
+				new double[] { 132, 149.9 }};
 		
 		int overcrowdingThreshold = params.getInteger("overcrowding_threshold");
 		int blockedThreshold = params.getInteger("blocked_threshold");
         int doorRadius = params.getInteger("door_radius");
         
-        int doorCount = 5;
-        for (int i = 0; i < doorCount; i++) {
+        for (double[] location : doorLocations) {
             Door door = new Door(space, grid, doorRadius, overcrowdingThreshold, blockedThreshold);
             context.add(door);
-            space.moveTo(door, doorLocations[i]);
+            space.moveTo(door, location);
             doors.add(door);
         }
 		
