@@ -9,6 +9,7 @@ import bitspls.evacuation.agents.Doctor;
 import bitspls.evacuation.agents.GasParticle;
 import bitspls.evacuation.agents.Human;
 import repast.simphony.context.Context;
+import repast.simphony.engine.environment.RunEnvironment;
 import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.query.space.grid.GridCell;
 import repast.simphony.query.space.grid.GridCellNgh;
@@ -60,7 +61,6 @@ public class Patient extends Human {
 			if (this.doctorToFollow == null || this.door != null) {
 				Doctor targetDoctor = findDoctorWithMaxCharisma();
 				if(targetDoctor != null && shouldFollowDoctorAgent(targetDoctor)) {
-					System.out.println("Followed Doctor");
 					this.doctorToFollow = targetDoctor;
 					this.doctorToFollow.startFollowing();
 					this.movementMode = PatientMode.FOLLOW_DOCTOR;
@@ -116,14 +116,12 @@ public class Patient extends Human {
 				this.doctorToFollow.stopFollowing();
 				this.doctorToFollow = null;
 				this.door = null;
-				System.out.println("Patient exited");
 			}
 		}
 	}
 
 	public boolean shouldFollowDoctorAgent(Doctor doctor) {
 		double probabilityOfFollowingDoctor = 0.4*doctor.getCharisma() + 0.6*(1 - getPanic());
-		System.out.println("Probability:  " + probabilityOfFollowingDoctor);
 		return randomFollowGenerator(probabilityOfFollowingDoctor);
 	}
 	
@@ -136,7 +134,6 @@ public class Patient extends Human {
 		double gasFactor = calculateGasParticleFactor();
 		double patientFactor = calculateGasParticleFactor();
 		double panic = this.basePanic + (this.patientPanicWeight * patientFactor) + (this.gasPanicWeight * gasFactor) ;
-		System.out.println("new panic: " + panic);
 		return panic;
 	}
 	
@@ -325,16 +322,28 @@ public class Patient extends Human {
 	
 	public void kill() {
     	super.kill();
-    	GridPoint pt = this.getGrid().getLocation(this);
-    	NdPoint spacePt = new NdPoint(pt.getX(), pt.getY());
 
-		Context<Object> context = ContextUtils.getContext(this);
-		DeadPatient deadPatient = new DeadPatient();
-		context.add(deadPatient);
-		this.getSpace().moveTo(deadPatient, spacePt.getX(), spacePt.getY());
-		this.getGrid().moveTo(deadPatient, pt.getX(), pt.getY());
-		
-		context.remove(this);
+    	/*
+    	 *  Note: We are not giving the agent global knowledge of the other agents in the system
+    	 *  These counts are only to stop the simulation when no human agents remain
+    	 */
+    	Context<Object> context = ContextUtils.getContext(this);
+    	int humanCount = context.getObjects(Doctor.class).size() + context.getObjects(Patient.class).size();
+    	
+    	System.out.println(humanCount + " agents remaining");
+    	if (humanCount > 1) {
+	    	GridPoint pt = this.getGrid().getLocation(this);
+	    	NdPoint spacePt = new NdPoint(pt.getX(), pt.getY());
+	
+			DeadPatient deadPatient = new DeadPatient();
+			context.add(deadPatient);
+			this.getSpace().moveTo(deadPatient, spacePt.getX(), spacePt.getY());
+			this.getGrid().moveTo(deadPatient, pt.getX(), pt.getY());
+			
+			context.remove(this);
+    	} else {
+    		RunEnvironment.getInstance().endRun();
+    	}
     }
 	
 	enum PatientMode {

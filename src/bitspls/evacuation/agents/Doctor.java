@@ -164,8 +164,6 @@ public class Doctor extends Human {
             }
             targetDoor.setLastVisitedtime(ticks);
         }
-        
-        System.out.println("num of doors: " + this.doorPoints.size());
     }
 
     
@@ -295,16 +293,23 @@ public class Doctor extends Human {
     
     public void kill() {
     	super.kill();
-    	GridPoint pt = this.getGrid().getLocation(this);
-    	NdPoint spacePt = new NdPoint(pt.getX(), pt.getY());
-
-		Context<Object> context = ContextUtils.getContext(this);
-		DeadDoctor deadDoctor = new DeadDoctor();
-		context.add(deadDoctor);
-		this.getSpace().moveTo(deadDoctor, spacePt.getX(), spacePt.getY());
-		this.getGrid().moveTo(deadDoctor, pt.getX(), pt.getY());
-		
-		context.remove(this);
+    	Context<Object> context = ContextUtils.getContext(this);
+    	int humanCount = context.getObjects(Doctor.class).size() + context.getObjects(Patient.class).size();
+    	
+    	System.out.println(humanCount + " agents remaining");
+    	if (humanCount > 1) {
+	    	GridPoint pt = this.getGrid().getLocation(this);
+	    	NdPoint spacePt = new NdPoint(pt.getX(), pt.getY());
+	
+			DeadDoctor deadDoctor = new DeadDoctor();
+			context.add(deadDoctor);
+			this.getSpace().moveTo(deadDoctor, spacePt.getX(), spacePt.getY());
+			this.getGrid().moveTo(deadDoctor, pt.getX(), pt.getY());
+			
+			context.remove(this);
+    	} else {
+    		RunEnvironment.getInstance().endRun();
+    	}
     }
     
     public enum DoctorMode {
