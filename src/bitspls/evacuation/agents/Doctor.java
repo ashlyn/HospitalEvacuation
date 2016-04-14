@@ -1,6 +1,7 @@
 package bitspls.evacuation.agents;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -13,7 +14,6 @@ import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.query.space.grid.GridCellNgh;
 import repast.simphony.random.RandomHelper;
 import repast.simphony.relogo.Utility;
-import repast.simphony.space.SpatialMath;
 import repast.simphony.space.continuous.ContinuousSpace;
 import repast.simphony.space.continuous.NdPoint;
 import repast.simphony.space.grid.Grid;
@@ -22,12 +22,12 @@ import repast.simphony.util.SimUtilities;
 import repast.simphony.query.space.grid.GridCell;
 
 public class Doctor extends Human {
+
     private DoctorMode doctorMode;
     private static final int SPEED = 1;
     private List<DoctorDoorPoint> doorPoints;
     private int followers;
     private double charisma;
-    private int stepsTakenAwayFromDoor;
     
     public Doctor(ContinuousSpace<Object> space, Grid<Object> grid, double meanCharisma, double stdCharisma, Random random) {
         this.setSpace(space);
@@ -39,7 +39,6 @@ public class Doctor extends Human {
         this.followers = 0;
         this.charisma = stdCharisma * random.nextGaussian() + meanCharisma;
         this.doctorMode = DoctorMode.DOOR_SEEK;
-        this.stepsTakenAwayFromDoor = 0;
     }
     
     public void addDoor(NdPoint doorPoint, DoorPointEnum status) {
@@ -60,13 +59,31 @@ public class Doctor extends Human {
             }
         }
     }
-    
+
     private void findPatients() {
-        if (stepsTakenAwayFromDoor < 30) {
-            moveAwayFromDoor();
-        } else {
-            moveRandomly();
-        }
+        moveRandomly();
+    }
+
+    private void moveRandomly() {
+        GridPoint pt = this.getGrid().getLocation(this);
+
+        List<Integer> options = new ArrayList<Integer>();
+        options.add(0);
+        options.add(1);
+        options.add(-1);
+        Collections.shuffle(options);
+        
+        int xRand = RandomHelper.getUniform().nextIntFromTo(0, 2);
+        int xShift = options.get(xRand) * 10;
+        Collections.shuffle(options);
+        
+        int yRand = RandomHelper.getUniform().nextIntFromTo(0, 2);
+        int yShift = options.get(yRand) * 10;
+        
+        GridPoint point = new GridPoint(pt.getX() + xShift, pt.getY() + yShift);
+    
+        
+        super.moveTowards(point);
     }
     
     private void exchangeInformationWithDoctors() {
@@ -90,7 +107,25 @@ public class Doctor extends Human {
             }
         }
     }
-    
+
+    private void moveTowardsDoor() {
+        Pair<Double, GridPoint> distancePointPair = findClosestAvailableDoor();
+        
+        double closestDoorDistance = distancePointPair.getKey();
+        GridPoint closestDoorPoint = distancePointPair.getValue();
+        
+        if (closestDoorDistance < 3) {
+            doctorMode = DoctorMode.PATIENT_SEEK;
+
+        }
+        
+        if (closestDoorPoint != null) {
+            moveTowards(closestDoorPoint);
+        } else {
+            this.kill();
+        }
+    }
+
     private void updateDoorKnowledge() {
         List<Door> doorsInRadius = findDoorsInRadius();
 
@@ -189,45 +224,6 @@ public class Doctor extends Human {
         return true;
     }
     
-    private void moveRandomly() {
-        GridPoint pt = this.getGrid().getLocation(this);
-        GridPoint pointToMoveTo = super.findLeastGasPoint(pt);
-        
-        super.moveTowards(pointToMoveTo);
-    }
-    
-    private void moveAwayFromDoor() {
-        this.stepsTakenAwayFromDoor++;
-        Pair<Double, GridPoint> distancePointPair = findClosestAvailableDoor();
-        GridPoint doorLocation = distancePointPair.getValue();
-        
-        NdPoint myPoint = getSpace().getLocation(this);
-        NdPoint otherPoint = new NdPoint(doorLocation.getX(), doorLocation.getY());
-        double angleAwayFromDoor = SpatialMath.calcAngleFor2DMovement(getSpace(), myPoint, otherPoint);
-        
-        angleAwayFromDoor -= angleAwayFromDoor > Math.PI ? Math.PI : -Math.PI; 
-        
-        move(angleAwayFromDoor);
-    }
-    
-    private void moveTowardsDoor() {
-        Pair<Double, GridPoint> distancePointPair = findClosestAvailableDoor();
-        
-        double closestDoorDistance = distancePointPair.getKey();
-        GridPoint closestDoorPoint = distancePointPair.getValue();
-        
-        if (closestDoorDistance < 3) {
-            doctorMode = DoctorMode.PATIENT_SEEK;
-            this.stepsTakenAwayFromDoor = 0;
-        }
-        
-        if (closestDoorPoint != null) {
-            moveTowards(closestDoorPoint);
-        } else {
-            this.kill();
-        }
-    }
-    
     private Pair<Double, GridPoint> findClosestAvailableDoor() {
         GridPoint pt = this.getGrid().getLocation(this);
         
@@ -272,13 +268,7 @@ public class Doctor extends Human {
         
         return closestDoor;
     }
-    
-    private GridPoint findNextLocation() {
-        
-        
-        return null;
-    }
-    
+
     public void startFollowing() {
         this.followers++;
         doctorMode = DoctorMode.DOOR_SEEK;
