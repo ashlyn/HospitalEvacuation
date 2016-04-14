@@ -237,12 +237,9 @@ public class Patient extends Human {
 		for(Patient patient: patients) {
 			GridPoint pt = getGrid().getLocation(patient);
 			double distance = getGrid().getDistance(currentLocation, pt);
-			//System.out.println("distance: " + distance);
 			if (distance != 0) {
-				//System.out.println("panic: " + patient.getPanic());
 				totalPatientFactor += patient.getPanic()/distance;
 			}
-			//System.out.println("totalPatientFactor: " + totalPatientFactor);
 		}
 		
 		return totalPatientFactor;
@@ -270,7 +267,6 @@ public class Patient extends Human {
 	
 	private double calculateGasParticleFactor() {
 		List<GridCell<GasParticle>> surroundingGas = findGasAgentsInRadiusOfKnowledge();
-		//System.out.println(calculateSurroundingGasParticleFactor(surroundingGas)/worstCase);
 		double surroundingFactor = calculateSurroundingGasParticleFactor(surroundingGas);
 		if(surroundingFactor > worstCase) {
 			return 1;

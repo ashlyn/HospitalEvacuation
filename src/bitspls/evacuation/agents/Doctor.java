@@ -31,6 +31,7 @@ public class Doctor extends Human {
     private List<DoctorDoorPoint> doorPoints;
     private int followers;
     private double charisma;
+    private GridPoint lastPointMovedTowards;
     
     public Doctor(ContinuousSpace<Object> space, Grid<Object> grid, double meanCharisma, double stdCharisma, Random random) {
         this.setSpace(space);
@@ -53,18 +54,63 @@ public class Doctor extends Human {
     @ScheduledMethod(start = 1, interval = SPEED)
     public void run() {
         if (!isDead()) {
-            updateDoorKnowledge();
-            exchangeInformationWithDoctors();
-            if (doctorMode == DoctorMode.PATIENT_SEEK) {
-                findPatients();
-            } else {
+            if(shouldExit()) {
+                this.doctorMode = DoctorMode.ESCAPE;
                 moveTowardsDoor();
+                System.out.println("here");
+            }
+            else {
+                updateDoorKnowledge();
+                exchangeInformationWithDoctors();
+                if (doctorMode == DoctorMode.PATIENT_SEEK) {
+                    findPatients();
+                } else {
+                    moveTowardsDoor();
+                }
             }
         }
     }
+    
+    private boolean shouldExit() {
+        if (findNumberOfUnblockedDoors() == 1 || (isGasInRadius(7) && isDoorInRadius(7))) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    private Boolean isDoorInRadius(int radius) {
+        Boolean doorIsPresent = false;
+        GridPoint location = this.getGrid().getLocation(this);
+        GridCellNgh<Door> nghCreator = new GridCellNgh<Door>(this.getGrid(), location, Door.class, radius, radius);
+        List<GridCell<Door>> gridCells = nghCreator.getNeighborhood(true);
+        SimUtilities.shuffle(gridCells, RandomHelper.getUniform());
+        
+        for (GridCell<Door> cell : gridCells) {
+            if (cell.size() > 0) {
+                return true;
+            }
+        }
+
+        return doorIsPresent;
+    }
+    
+    private int findNumberOfUnblockedDoors() {
+        int num = 0;
+        for(DoctorDoorPoint door: doorPoints) {
+            if(door.getStatus() != DoorPointEnum.BLOCKED) {
+                num++;
+            }
+        }
+        return num;
+    }
 
     private void findPatients() {
-        moveRandomly();
+    	if (lastPointMovedTowards != null && Math.random() > .15) {
+    		super.moveTowards(lastPointMovedTowards);
+    	} else {
+    		moveRandomly();
+    	}
     }
 
     private void moveRandomly() {
@@ -77,16 +123,21 @@ public class Doctor extends Human {
         Collections.shuffle(options);
         
         int xRand = RandomHelper.getUniform().nextIntFromTo(0, 2);
-        int xShift = options.get(xRand) * 10;
+        int xShift = options.get(xRand) * 15;
         Collections.shuffle(options);
         
         int yRand = RandomHelper.getUniform().nextIntFromTo(0, 2);
-        int yShift = options.get(yRand) * 10;
+        int yShift = options.get(yRand) * 15;
         
         GridPoint point = new GridPoint(pt.getX() + xShift, pt.getY() + yShift);
     
-        
         super.moveTowards(point);
+        
+        if (xShift == 0 && yShift == 0) {
+        	lastPointMovedTowards = null;
+        } else {
+        	lastPointMovedTowards = point;        	
+        }
     }
     
     private void exchangeInformationWithDoctors() {
@@ -118,8 +169,13 @@ public class Doctor extends Human {
         GridPoint closestDoorPoint = distancePointPair.getValue();
         
         if (closestDoorDistance < 3) {
-            doctorMode = DoctorMode.PATIENT_SEEK;
-
+            if(isGasInRadius(5)) {
+                doctorMode = DoctorMode.ESCAPE;
+                System.out.println("escape");
+            }
+            else {
+                doctorMode = DoctorMode.PATIENT_SEEK;
+            }
         }
         
         if (closestDoorPoint != null) {
@@ -127,6 +183,22 @@ public class Doctor extends Human {
         } else {
             this.kill();
         }
+    }
+    
+    private Boolean isGasInRadius(int radius) {
+        Boolean gasIsPresent = false;
+        GridPoint location = this.getGrid().getLocation(this);
+        GridCellNgh<GasParticle> nghCreator = new GridCellNgh<GasParticle>(this.getGrid(), location, GasParticle.class, radius, radius);
+        List<GridCell<GasParticle>> gridCells = nghCreator.getNeighborhood(true);
+        SimUtilities.shuffle(gridCells, RandomHelper.getUniform());
+        
+        for (GridCell<GasParticle> cell : gridCells) {
+            if (cell.size() > 0) {
+                return true;
+            }
+        }
+
+        return gasIsPresent;
     }
 
     private void updateDoorKnowledge() {
@@ -142,7 +214,7 @@ public class Doctor extends Human {
             for(DoctorDoorPoint doorPoint: this.doorPoints) 
             {
                 if (doorPoint.getPoint().getX() == location.getX()
-                        && doorPoint.getPoint().getY() == location.getY()) {
+                    && doorPoint.getPoint().getY() == location.getY()) {
                     targetDoor = doorPoint;
                 }
             }
@@ -310,6 +382,10 @@ public class Doctor extends Human {
     	} else {
     		RunEnvironment.getInstance().endRun();
     	}
+    }
+    
+    public DoctorMode getMode() {
+        return this.doctorMode;
     }
     
     public enum DoctorMode {
