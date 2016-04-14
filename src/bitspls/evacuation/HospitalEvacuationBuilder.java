@@ -98,7 +98,6 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 			Doctor doctor = new Doctor(space, grid, meanCharisma, stdCharisma, r);
 			context.add(doctor);
 			doctors.add(doctor);
-			System.out.println("Charisma:  " + doctor.getCharisma());
 		}
 		
 		/*
@@ -115,7 +114,6 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 		for (int i = 0; i < patientCount; i++) {
 			Patient p = new Patient(space, grid, patientPanicWeight, gasPanicWeight, meanPanic, stdPanic, r);
 			context.add(p);
-			System.out.println("Panic:  " + p.getPanic());
 		}
 
 		for (Object obj : context) {

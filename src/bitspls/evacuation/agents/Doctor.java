@@ -81,14 +81,55 @@ public class Doctor extends Human {
     @ScheduledMethod(start = 1, interval = SPEED)
     public void run() {
         if (!isDead()) {
-            updateDoorKnowledge();
-            exchangeInformationWithDoctors();
-            if (doctorMode == DoctorMode.PATIENT_SEEK) {
-                findPatients();
-            } else {
+            if(shouldExit()) {
+                this.doctorMode = DoctorMode.ESCAPE;
                 moveTowardsDoor();
+                System.out.println("here");
+            }
+            else {
+                updateDoorKnowledge();
+                exchangeInformationWithDoctors();
+                if (doctorMode == DoctorMode.PATIENT_SEEK) {
+                    findPatients();
+                } else {
+                    moveTowardsDoor();
+                }
             }
         }
+    }
+    
+    private boolean shouldExit() {
+        if (findNumberOfUnblockedDoors() == 1 || (isGasInRadius(7) && isDoorInRadius(7))) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    private Boolean isDoorInRadius(int radius) {
+        Boolean doorIsPresent = false;
+        GridPoint location = this.getGrid().getLocation(this);
+        GridCellNgh<Door> nghCreator = new GridCellNgh<Door>(this.getGrid(), location, Door.class, radius, radius);
+        List<GridCell<Door>> gridCells = nghCreator.getNeighborhood(true);
+        SimUtilities.shuffle(gridCells, RandomHelper.getUniform());
+        
+        for (GridCell<Door> cell : gridCells) {
+            if (cell.size() > 0) {
+                return true;
+            }
+        }
+
+        return doorIsPresent;
+    }
+    
+    private int findNumberOfUnblockedDoors() {
+        int num = 0;
+        for(DoctorDoorPoint door: doorPoints) {
+            if(door.getStatus() != DoorPointEnum.BLOCKED) {
+                num++;
+            }
+        }
+        return num;
     }
 
     /**
@@ -174,7 +215,13 @@ public class Doctor extends Human {
         GridPoint closestDoorPoint = distancePointPair.getValue();
         
         if (closestDoorDistance < 3) {
-            doctorMode = DoctorMode.PATIENT_SEEK;
+            if(isGasInRadius(5)) {
+                doctorMode = DoctorMode.ESCAPE;
+                System.out.println("escape");
+            }
+            else {
+                doctorMode = DoctorMode.PATIENT_SEEK;
+            }
         }
         
         if (closestDoorPoint != null) {
@@ -182,6 +229,27 @@ public class Doctor extends Human {
         } else {
             this.kill();
         }
+    }
+    
+    /**
+     * Check if gas is near the door
+     * @param radius The radius to check for gas
+     * @return Where gas is near the door
+     */
+    private boolean isGasInRadius(int radius) {
+        Boolean gasIsPresent = false;
+        GridPoint location = this.getGrid().getLocation(this);
+        GridCellNgh<GasParticle> nghCreator = new GridCellNgh<GasParticle>(this.getGrid(), location, GasParticle.class, radius, radius);
+        List<GridCell<GasParticle>> gridCells = nghCreator.getNeighborhood(true);
+        SimUtilities.shuffle(gridCells, RandomHelper.getUniform());
+        
+        for (GridCell<GasParticle> cell : gridCells) {
+            if (cell.size() > 0) {
+                return true;
+            }
+        }
+
+        return gasIsPresent;
     }
 
     /**
@@ -202,7 +270,7 @@ public class Doctor extends Human {
             for(DoctorDoorPoint doorPoint: this.doorPoints) 
             {
                 if (doorPoint.getPoint().getX() == location.getX()
-                        && doorPoint.getPoint().getY() == location.getY()) {
+                    && doorPoint.getPoint().getY() == location.getY()) {
                     targetDoor = doorPoint;
                 }
             }
@@ -224,8 +292,6 @@ public class Doctor extends Human {
             }
             targetDoor.setLastVisitedtime(ticks);
         }
-        
-        System.out.println("num of doors: " + this.doorPoints.size());
     }
 
     /**
@@ -390,6 +456,10 @@ public class Doctor extends Human {
 	public void setCharisma(double charisma) {
 		this.charisma = charisma;
 	}
+	
+    public DoctorMode getMode() {
+        return this.doctorMode;
+    }
 	
 	/**
 	 * Enum to represent the state of a doctor
