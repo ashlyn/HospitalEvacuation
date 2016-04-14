@@ -15,10 +15,10 @@ import repast.simphony.parameter.Parameters;
 import repast.simphony.space.continuous.ContinuousSpace;
 import repast.simphony.space.continuous.NdPoint;
 import repast.simphony.space.continuous.RandomCartesianAdder;
+import repast.simphony.space.grid.BouncyBorders;
 import repast.simphony.space.grid.Grid;
 import repast.simphony.space.grid.GridBuilderParameters;
 import repast.simphony.space.grid.SimpleGridAdder;
-import repast.simphony.space.grid.StickyBorders;
 import bitspls.evacuation.agents.Doctor;
 import bitspls.evacuation.agents.GasParticle;
 import bitspls.evacuation.agents.Patient;
@@ -46,12 +46,12 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 				.createContinuousSpaceFactory(null);
 		ContinuousSpace<Object> space = spaceFactory.createContinuousSpace(
 				"space", context, new RandomCartesianAdder<Object>(),
-				new repast.simphony.space.continuous.StickyBorders(), new double[] {200, 150},
+				new repast.simphony.space.continuous.BouncyBorders(), new double[] {200, 150},
 				new double[] {0, 0});
 
 		GridFactory gridFactory = GridFactoryFinder.createGridFactory(null);
 		Grid<Object> grid = gridFactory.createGrid("grid", context,
-				new GridBuilderParameters<Object>(new StickyBorders(),
+				new GridBuilderParameters<Object>(new BouncyBorders(),
 						new SimpleGridAdder<Object>(), true, new int[] {200, 150}, new int[] {0, 0}));
 
 		int gasCount = 1;
@@ -64,19 +64,23 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 		 */
 		List<Door> doors = new ArrayList<Door>();
 		double[][] doorLocations = new double[][]
-				{ new double[] { 80, 74 },
-				new double[] { 20, 74 },
-				new double[] { 99, 28 },
-				new double[] { 99, 27 },
-				new double[] { 57, 74 }};
+				{ new double[] { 80, 149.9 },
+				new double[] { 20, 149.9 },
+				new double[] { 199.9, 28 },
+				new double[] { 0.1, 27 },
+				new double[] { 57, 0.1 }};
 		
-		int doorCount = params.getInteger("door_count");
-		for (int i = 0; i < doorCount; i++) {
-			Door door = new Door(space, grid);
-			context.add(door);
-			space.moveTo(door, doorLocations[i]);
-			doors.add(door);
-		}
+		int overcrowdingThreshold = params.getInteger("overcrowding_threshold");
+		int blockedThreshold = params.getInteger("blocked_threshold");
+        int doorRadius = params.getInteger("door_radius");
+        
+        int doorCount = params.getInteger("door_count");
+        for (int i = 0; i < doorCount; i++) {
+            Door door = new Door(space, grid, doorRadius, overcrowdingThreshold, blockedThreshold);
+            context.add(door);
+            space.moveTo(door, doorLocations[i]);
+            doors.add(door);
+        }
 		
 		Random r = new Random();
 		
@@ -174,9 +178,9 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 			}
 		}
 		
-		doctor.addDoor(closestDoor);
-		doctor.addDoor(secondClosestDoor);
-		doctor.addDoor(thirdClosestDoor);
+		doctor.addDoor(closestDoor, DoorPointEnum.AVAILABLE);
+		doctor.addDoor(secondClosestDoor, DoorPointEnum.AVAILABLE);
+		doctor.addDoor(thirdClosestDoor, DoorPointEnum.AVAILABLE);
 	}
 
 }

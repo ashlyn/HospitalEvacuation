@@ -1,5 +1,6 @@
 package bitspls.evacuation;
 
+
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import repast.simphony.space.continuous.NdPoint;
@@ -11,22 +12,27 @@ import repast.simphony.space.continuous.NdPoint;
  */
 public class DoctorDoorPoint {
 	private NdPoint point;			// point where the door is located (typically not whole-number grid points)
-	private boolean isOvercrowded;  // indicates if a door is overcrowded - can become not-overcrowded over time
-	private boolean isBlocked;		// indicates if a door is blocked by gas - if blocked, it will not become unblocked
 	private double lastVisit;		// tick count for the last time a doctor visited or observed the door - indicates freshness of data compared to other doctors'
+	private DoorPointEnum status;	// status indicating if door is blocked, overcrowded, or available
 	
 	/**
 	 * Constructor for a DoctorDoorPoint
-	 * @param point Point where a door is located
-	 * @param isOvercrowded Is the door overcrowded
-	 * @param isBlocked Is the door blocked by gas
-	 * @param lastVisit Tick count for last visit
+	 * @param point The point on a grid where the door is
+	 * @param status The status of the door
+	 * @param lastVisit The last time a doctor visited the door
 	 */
-	public DoctorDoorPoint(NdPoint point, boolean isOvercrowded, boolean isBlocked, double lastVisit) {
+	public DoctorDoorPoint(NdPoint point, DoorPointEnum status, double lastVisit) {
 		this.point = point;
-		this.isOvercrowded = isOvercrowded;
-		this.isBlocked = isBlocked;
 		this.lastVisit = lastVisit;
+		this.status = status;
+	}
+
+	public DoorPointEnum getStatus() {
+		return this.status;
+	}
+	
+	public void setStatus(DoorPointEnum status) {
+		this.status = status;
 	}
 	
 	/*
@@ -38,22 +44,6 @@ public class DoctorDoorPoint {
 	
 	public void setPoint(NdPoint point) {
 		this.point = point;
-	}
-	
-	public boolean isOvercrowded() {
-		return this.isOvercrowded;
-	}
-	
-	public void setOvercrowded(boolean overcrowded) {
-		this.isOvercrowded = overcrowded;
-	}
-	
-	public boolean isBlocked() {
-		return this.isBlocked;
-	}
-	
-	public void setBlocked(boolean blocked) {
-		this.isBlocked = blocked;
 	}
 	
 	public double getLastVisitedTime() {

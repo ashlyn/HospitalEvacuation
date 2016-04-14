@@ -146,21 +146,22 @@ public class Patient extends Human {
 		return pointToMoveTo;
 	}
 	
-	/**
-	 * Find a random point with no gas in it
-	 */
-	protected GridPoint findLeastGasPoint(GridPoint pt) {
-		GridCellNgh<GasParticle> nghCreator = new GridCellNgh<GasParticle>(this.getGrid(), pt, GasParticle.class, this.getRadiusOfKnowledge(), this.getRadiusOfKnowledge());
-		List<GridCell<GasParticle>> gridCells = nghCreator.getNeighborhood(true);
-		SimUtilities.shuffle(gridCells, RandomHelper.getUniform());
+	protected void moveTowards(GridPoint pt) {
+		super.moveTowards(pt);
 		
-		GridPoint pointWithLeastGas = null;
-		for (GridCell<GasParticle> cell : gridCells) {
-			if (cell.size() == 0) {
-				pointWithLeastGas = cell.getPoint();
+		if (this.door != null) {
+			GridPoint currentPt = this.getGrid().getLocation(this);
+			GridCellNgh<Door> doorNghCreator = new GridCellNgh<Door>(this.getGrid(), currentPt, Door.class, 0, 0);
+			List<GridCell<Door>> doorGridCells = doorNghCreator.getNeighborhood(true);
+			GridPoint doorPt = this.getGrid().getLocation(this.door);
+			if (doorGridCells.contains(doorPt)) {
+				this.exited = true;
+				this.doctorToFollow.stopFollowing();
+				this.doctorToFollow = null;
+				this.door = null;
+				System.out.println("Patient exited");
 			}
 		}
-		return pointWithLeastGas;
 	}
 
 	/**
