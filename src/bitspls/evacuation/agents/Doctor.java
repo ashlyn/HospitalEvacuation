@@ -28,6 +28,7 @@ public class Doctor extends Human {
     private List<DoctorDoorPoint> doorPoints;
     private int followers;
     private double charisma;
+    private GridPoint lastPointMovedTowards;
     
     public Doctor(ContinuousSpace<Object> space, Grid<Object> grid, double meanCharisma, double stdCharisma, Random random) {
         this.setSpace(space);
@@ -61,7 +62,11 @@ public class Doctor extends Human {
     }
 
     private void findPatients() {
-        moveRandomly();
+    	if (lastPointMovedTowards != null && Math.random() > .15) {
+    		super.moveTowards(lastPointMovedTowards);
+    	} else {
+    		moveRandomly();
+    	}
     }
 
     private void moveRandomly() {
@@ -74,16 +79,21 @@ public class Doctor extends Human {
         Collections.shuffle(options);
         
         int xRand = RandomHelper.getUniform().nextIntFromTo(0, 2);
-        int xShift = options.get(xRand) * 10;
+        int xShift = options.get(xRand) * 15;
         Collections.shuffle(options);
         
         int yRand = RandomHelper.getUniform().nextIntFromTo(0, 2);
-        int yShift = options.get(yRand) * 10;
+        int yShift = options.get(yRand) * 15;
         
         GridPoint point = new GridPoint(pt.getX() + xShift, pt.getY() + yShift);
     
-        
         super.moveTowards(point);
+        
+        if (xShift == 0 && yShift == 0) {
+        	lastPointMovedTowards = null;
+        } else {
+        	lastPointMovedTowards = point;        	
+        }
     }
     
     private void exchangeInformationWithDoctors() {
