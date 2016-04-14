@@ -14,7 +14,7 @@ import repast.simphony.space.grid.GridPoint;
 import repast.simphony.util.SimUtilities;
 
 /**
- * Abstract base class to reperesent all human agents in the system
+ * Abstract base class to represent all human agents in the system
  * 
  * Tracks variables (dead boolean, grid, space, radius of knowledge, etc.)
  * common to all types of human agents and provides methods for moving
@@ -28,7 +28,6 @@ public abstract class Human {
 	private ContinuousSpace<Object> space;
 	private Grid<Object> grid;
 	private int radiusOfKnowledge;
-	private int speed;
 	
 	/**
 	 * Move towards a given point
@@ -268,13 +267,5 @@ public abstract class Human {
 	
 	protected void setRadiusOfKnowledge(int r) {
 		this.radiusOfKnowledge = r;
-	}
-	
-	protected int getSpeed() {
-		return this.speed;
-	}
-	
-	protected void setSpeed(int speed) {
-		this.speed = speed;
 	}
 }

@@ -17,7 +17,6 @@ import repast.simphony.random.RandomHelper;
 import repast.simphony.relogo.Utility;
 import repast.simphony.space.continuous.ContinuousSpace;
 import repast.simphony.space.continuous.NdPoint;
-import repast.simphony.space.graph.Network;
 import repast.simphony.space.grid.Grid;
 import repast.simphony.space.grid.GridPoint;
 import repast.simphony.util.ContextUtils;
@@ -42,7 +41,6 @@ import repast.simphony.query.space.grid.GridCell;
  */
 public class Doctor extends Human {
 	private DoctorMode doctorMode;
-	private static final int SPEED = 1;
 	private List<DoctorDoorPoint> doorPoints;
 	private int followers;
 	private double charisma;
@@ -61,7 +59,6 @@ public class Doctor extends Human {
         this.setGrid(grid);
         this.setDead(false);
         this.setRadiusOfKnowledge(15);
-        this.setSpeed(SPEED);
         this.doorPoints = new ArrayList<>();
         this.followers = 0;
         this.charisma = stdCharisma * random.nextGaussian() + meanCharisma;
@@ -81,7 +78,7 @@ public class Doctor extends Human {
     /**
 	 * Scheduled method to move a doctor if they are still alive
 	 */
-    @ScheduledMethod(start = 1, interval = SPEED)
+    @ScheduledMethod(start = 1, interval = 1)
     public void run() {
         if (!isDead()) {
             if(shouldExit()) {
