@@ -1,5 +1,5 @@
 <repast.simphony.data2.engine.DataSetDescriptor>
-  <name>Panic Levels</name>
+  <name>Agent Counts</name>
   <type>AGGREGATE</type>
   <inclTick>true</inclTick>
   <inclBatchRun>false</inclBatchRun>
@@ -11,21 +11,47 @@
     <pType>LAST</pType>
     <duration>-1.0</duration>
     <frequency>REPEAT</frequency>
-    <hashCode>-1082275404</hashCode>
+    <hashCode>1189439156</hashCode>
   </scheduleParams>
   <atEnd>false</atEnd>
-  <methodDataSources class="linked-hash-map">
+  <methodDataSources class="linked-hash-map"/>
+  <countSources class="linked-hash-map">
     <entry>
-      <string>Mean Effective Panic</string>
-      <repast.simphony.data2.engine.MethodDataSourceDefinition>
-        <id>Mean Effective Panic</id>
-        <className>bitspls.evacuation.agents.Patient</className>
-        <methodName>getPanic</methodName>
-        <aggType>MEAN</aggType>
-      </repast.simphony.data2.engine.MethodDataSourceDefinition>
+      <string>Dead Doctors</string>
+      <repast.simphony.data2.engine.CountSourceDefinition>
+        <typeName>bitspls.evacuation.agents.DeadDoctor</typeName>
+        <id>Dead Doctors</id>
+      </repast.simphony.data2.engine.CountSourceDefinition>
     </entry>
-  </methodDataSources>
-  <countSources class="linked-hash-map"/>
+    <entry>
+      <string>Dead Patients</string>
+      <repast.simphony.data2.engine.CountSourceDefinition>
+        <typeName>bitspls.evacuation.agents.DeadPatient</typeName>
+        <id>Dead Patients</id>
+      </repast.simphony.data2.engine.CountSourceDefinition>
+    </entry>
+    <entry>
+      <string>Doctors</string>
+      <repast.simphony.data2.engine.CountSourceDefinition>
+        <typeName>bitspls.evacuation.agents.Doctor</typeName>
+        <id>Doctors</id>
+      </repast.simphony.data2.engine.CountSourceDefinition>
+    </entry>
+    <entry>
+      <string>Patients</string>
+      <repast.simphony.data2.engine.CountSourceDefinition>
+        <typeName>bitspls.evacuation.agents.Patient</typeName>
+        <id>Patients</id>
+      </repast.simphony.data2.engine.CountSourceDefinition>
+    </entry>
+    <entry>
+      <string>Gas Particles</string>
+      <repast.simphony.data2.engine.CountSourceDefinition>
+        <typeName>bitspls.evacuation.agents.GasParticle</typeName>
+        <id>Gas Particles</id>
+      </repast.simphony.data2.engine.CountSourceDefinition>
+    </entry>
+  </countSources>
   <customNADataSources class="linked-hash-map"/>
   <customAggDataSources class="linked-hash-map"/>
 </repast.simphony.data2.engine.DataSetDescriptor>

@@ -8,14 +8,17 @@ import bitspls.evacuation.Door;
 import bitspls.evacuation.agents.Doctor;
 import bitspls.evacuation.agents.GasParticle;
 import bitspls.evacuation.agents.Human;
+import repast.simphony.context.Context;
 import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.query.space.grid.GridCell;
 import repast.simphony.query.space.grid.GridCellNgh;
 import repast.simphony.random.RandomHelper;
 import repast.simphony.space.continuous.ContinuousSpace;
+import repast.simphony.space.continuous.NdPoint;
 import repast.simphony.space.grid.Grid;
 import repast.simphony.space.grid.GridDimensions;
 import repast.simphony.space.grid.GridPoint;
+import repast.simphony.util.ContextUtils;
 import repast.simphony.util.SimUtilities;
 
 public class Patient extends Human {
@@ -319,6 +322,20 @@ public class Patient extends Human {
 	public void setBasePanic(double panic) {
 		this.basePanic = panic;
 	}
+	
+	public void kill() {
+    	super.kill();
+    	GridPoint pt = this.getGrid().getLocation(this);
+    	NdPoint spacePt = new NdPoint(pt.getX(), pt.getY());
+
+		Context<Object> context = ContextUtils.getContext(this);
+		DeadPatient deadPatient = new DeadPatient();
+		context.add(deadPatient);
+		this.getSpace().moveTo(deadPatient, spacePt.getX(), spacePt.getY());
+		this.getGrid().moveTo(deadPatient, pt.getX(), pt.getY());
+		
+		context.remove(this);
+    }
 	
 	enum PatientMode {
 		AVOID_GAS,

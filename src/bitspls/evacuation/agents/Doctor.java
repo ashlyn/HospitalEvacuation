@@ -9,6 +9,7 @@ import bitspls.evacuation.DoctorDoorPoint;
 import bitspls.evacuation.Door;
 import bitspls.evacuation.DoorPointEnum;
 import javafx.util.Pair;
+import repast.simphony.context.Context;
 import repast.simphony.engine.environment.RunEnvironment;
 import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.query.space.grid.GridCellNgh;
@@ -16,8 +17,10 @@ import repast.simphony.random.RandomHelper;
 import repast.simphony.relogo.Utility;
 import repast.simphony.space.continuous.ContinuousSpace;
 import repast.simphony.space.continuous.NdPoint;
+import repast.simphony.space.graph.Network;
 import repast.simphony.space.grid.Grid;
 import repast.simphony.space.grid.GridPoint;
+import repast.simphony.util.ContextUtils;
 import repast.simphony.util.SimUtilities;
 import repast.simphony.query.space.grid.GridCell;
 
@@ -288,6 +291,20 @@ public class Doctor extends Human {
     
     public void setCharisma(double charisma) {
         this.charisma = charisma;
+    }
+    
+    public void kill() {
+    	super.kill();
+    	GridPoint pt = this.getGrid().getLocation(this);
+    	NdPoint spacePt = new NdPoint(pt.getX(), pt.getY());
+
+		Context<Object> context = ContextUtils.getContext(this);
+		DeadDoctor deadDoctor = new DeadDoctor();
+		context.add(deadDoctor);
+		this.getSpace().moveTo(deadDoctor, spacePt.getX(), spacePt.getY());
+		this.getGrid().moveTo(deadDoctor, pt.getX(), pt.getY());
+		
+		context.remove(this);
     }
     
     public enum DoctorMode {

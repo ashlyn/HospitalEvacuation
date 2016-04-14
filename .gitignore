@@ -7,6 +7,7 @@ tmp/
 *~.nib
 *.log
 *.log.*
+Repast.settings
 local.properties
 .settings/
 .loadpath

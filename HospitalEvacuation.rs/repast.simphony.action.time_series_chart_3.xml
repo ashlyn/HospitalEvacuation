@@ -1,9 +1,9 @@
 <repast.simphony.chart2.engine.TimeSeriesChartDescriptor>
-  <name>Gas Particles</name>
-  <dataSet>Agent Counts</dataSet>
+  <name>Mean Panic</name>
+  <dataSet>Panic Levels</dataSet>
   <xAxisLabel>Tick Count</xAxisLabel>
-  <yAxisLabel>Number of Agents</yAxisLabel>
-  <chartTitle>Gas Particle Count</chartTitle>
+  <yAxisLabel>Panic</yAxisLabel>
+  <chartTitle>Effective Panic Levels</chartTitle>
   <type>TIME_SERIES</type>
   <background>
     <red>192</red>
@@ -21,12 +21,12 @@
   <showLegend>true</showLegend>
   <seriesIds>
     <entry>
-      <string>Gas Particles</string>
+      <string>Mean Effective Panic</string>
       <SeriesData>
-        <label>Gas Particles</label>
+        <label>Mean Effective Panic</label>
         <color>
-          <red>153</red>
-          <green>204</green>
+          <red>0</red>
+          <green>0</green>
           <blue>255</blue>
           <alpha>255</alpha>
         </color>
