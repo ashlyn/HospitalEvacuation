@@ -16,20 +16,36 @@ import repast.simphony.space.grid.GridPoint;
 import repast.simphony.util.ContextUtils;
 import repast.simphony.util.SimUtilities;
 
+/**
+ * Class to represent simple gas particle agent
+ * Gas particles only spread and poison human agents
+ * @author Bits Please
+ */
 public class GasParticle {
 	private ContinuousSpace<Object> space;
 	private Grid<Object> grid;
 	boolean moved = false;
 	
+	/**
+	 * Constructor for gas particle agent
+	 * @param space Continuous space the gas is located in
+	 * @param grid Grid the gas is located in
+	 */
 	public GasParticle(ContinuousSpace<Object> space, Grid<Object> grid) {
 		this.space = space;
 		this.grid = grid;
 	}
 	
+	/**
+	 * Scheduled method to allow the gas particle to spawn into an adjacent square
+	 * if it has not already done so
+	 * Also wraps the method that checks if there are human agents nearby to poison
+	 */
 	@ScheduledMethod(start = 1, interval = 1)
 	public void spawn() {
 		int ticks = (int) RunEnvironment.getInstance().getCurrentSchedule().getTickCount();
 
+		// Only spawn on certain ticks
 		if (!moved && ticks % 10 == 0) {
 		GridPoint pt = grid.getLocation(this);
 			if (pt != null) {
@@ -40,6 +56,7 @@ public class GasParticle {
 				List<GridCell<GasParticle>> gridCells = nghCreator.getNeighborhood(true);
 				SimUtilities.shuffle(gridCells, RandomHelper.getUniform());
 				
+				// Find a point that does not already have gas in it
 				GridPoint pointWithLeastGas = null;
 				for (GridCell<GasParticle> cell : gridCells) {
 					if (cell.size() == 0) {
@@ -47,6 +64,7 @@ public class GasParticle {
 					}
 				}
 				
+				// Spawn a new gas particle into that point
 				if (pointWithLeastGas != null) {
 					NdPoint spacePt = new NdPoint(pointWithLeastGas.getX(), pointWithLeastGas.getY());
 					Context<Object> context = ContextUtils.getContext(this);
@@ -57,9 +75,14 @@ public class GasParticle {
 				}
 			}
 		}
+		
+		// Posion humans if available
 		poison();
 	}
 	
+	/**
+	 * Posions any humans occupying the same grid point as the gas agent
+	 */
 	public void poison() {
 		GridPoint pt = grid.getLocation(this);
 		List<Human> humans = new ArrayList<Human>();

@@ -23,8 +23,19 @@ import bitspls.evacuation.agents.Doctor;
 import bitspls.evacuation.agents.GasParticle;
 import bitspls.evacuation.agents.Patient;
 
+/**
+ * @author Bits Please
+ * HospitalEvacuationBuilder builds the initial space and grid
+ * Doctors, Patients, Gas Particles, and Doors are placed into the space and grid
+ * The relevant user parameters are read in from the Repast GUI and used
+ * to calculate values (agent counts, starting panic, charisma, etc.)
+ */
 public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 
+	/**
+	 * Builds the initial are for the hospital evacuation simulation
+	 * @param context Context to add space, grid, and agents to
+	 */
 	@Override
 	public Context<Object> build(Context<Object> context) {
 		context.setId("HospitalEvacuation");
@@ -48,8 +59,10 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 			context.add(new GasParticle(space, grid));
 		}
 		
+		/*
+		 * Doors are statically placed along the edges of the space
+		 */
 		List<Door> doors = new ArrayList<Door>();
-		
 		double[][] doorLocations = new double[][]
 				{ new double[] { 80, 74 },
 				new double[] { 20, 74 },
@@ -67,6 +80,12 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 		
 		Random r = new Random();
 		
+		/*
+		 * Generate the number of doctors given by the doctor_count parameter
+		 * Doctors are initialized to have a charisma level picked from a
+		 * Guassian distribution with a mean of mean_charisma and standard
+		 * deviation of std_charisma
+		 */
 		List<Doctor> doctors = new ArrayList<Doctor>();
 		double meanCharisma = params.getDouble("mean_charisma");
 		double stdCharisma = params.getDouble("std_charisma");
@@ -78,6 +97,12 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 			System.out.println("Charisma:  " + doctor.getCharisma());
 		}
 		
+		/*
+		 * Generate the number of patients given by the patient_count parameter
+		 * Patients are initialized to have a panic level picked from a
+		 * Guassian distribution with a mean of mean_panic and standard
+		 * deviation of std_panic
+		 */
 		double meanPanic = params.getDouble("mean_panic");
 		double stdPanic = params.getDouble("std_panic");
 		double patientPanicWeight = params.getDouble("patient_weight");
@@ -94,6 +119,9 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 			grid.moveTo(obj, (int) pt.getX(), (int) pt.getY());
 		}
 		
+		/*
+		 * Give doctors knowledge of the closest 3 doors
+		 */
 		for (Doctor doctor : doctors) {
 			findClosestThreeDoors(doctor, doors, space);
 		}
@@ -101,6 +129,13 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 		return context;
 	}
 	
+	/**
+	 * Find the closest 3 doors to a doctor and adds them to it's knowledge
+	 * This is one of the few pieces of global knowledge that the doctors have
+	 * @param doctor Doctor to give knowledge of doors to
+	 * @param doors List of all doors in the context
+	 * @param space The continuous space in which the doors are located
+	 */
 	private void findClosestThreeDoors(Doctor doctor, List<Door> doors, ContinuousSpace<Object> space) {
 		double closestDoorDistance = Double.POSITIVE_INFINITY;
 		double secondClosestDoorDistance = Double.POSITIVE_INFINITY;
@@ -112,6 +147,10 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 		
 		NdPoint doctorLocation = space.getLocation(doctor);
 		
+		/*
+		 * Iterate through all doors, keeping track of the 3 minimum distances and
+		 * the doors at those distances
+		 */
 		for (Door door : doors) {
 			NdPoint point = space.getLocation(door);
 			double distance = Math.sqrt(Math.pow(point.getX() - doctorLocation.getX(), 2)

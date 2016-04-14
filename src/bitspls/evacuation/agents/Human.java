@@ -13,6 +13,13 @@ import repast.simphony.space.grid.Grid;
 import repast.simphony.space.grid.GridPoint;
 import repast.simphony.util.SimUtilities;
 
+/**
+ * Abstract base class to reperesent all human agents in the system
+ * 
+ * Tracks variables (dead boolean, grid, space, radius of knowledge, etc.)
+ * common to all types of human agents and provides methods for moving
+ * @author Bits Please
+ */
 public abstract class Human {
 	private static final double MOVEMENT_DISTANCE = 1;
 	
@@ -23,6 +30,12 @@ public abstract class Human {
 	private int radiusOfKnowledge;
 	private int speed;
 	
+	/**
+	 * Move towards a given point
+	 * If in a "goal-seeking" state (ex. moving towards a door)
+	 * navigate around obstacles (areas with gas)
+	 * @param pt Point to move towards
+	 */
 	protected void moveTowards(GridPoint pt) {
 		if (pt != null && !pt.equals(grid.getLocation(this))) {
 			NdPoint myPoint = space.getLocation(this);
@@ -33,7 +46,6 @@ public abstract class Human {
 			
 			if (isGoalSeekState) {
 				if (gasToAvoid != null) {
-					System.out.println("Gas in way");
 					isGoalSeekState = false;
 				}
 			}
@@ -56,12 +68,21 @@ public abstract class Human {
 		}
 	}
 	
+	/**
+	 * Move along a given angle
+	 * @param angle Angle to move the agent along
+	 */
 	protected void move(double angle) {
 		space.moveByVector(this, MOVEMENT_DISTANCE, angle, 0);
 		NdPoint point = space.getLocation(this);
 		grid.moveTo(this, (int)point.getX(), (int)point.getY());
 	}
 	
+	/**
+	 * Find a point that does not contain any gas agents
+	 * @param pt Point to center the search around
+	 * @return GridPoint that has no gas particles present
+	 */
 	protected GridPoint findLeastGasPoint(GridPoint pt) {
 		GridCellNgh<GasParticle> nghCreator = new GridCellNgh<GasParticle>(this.getGrid(), pt, GasParticle.class, this.getRadiusOfKnowledge(), this.getRadiusOfKnowledge());
 		List<GridCell<GasParticle>> gridCells = nghCreator.getNeighborhood(true);
@@ -76,6 +97,10 @@ public abstract class Human {
 		return pointWithLeastGas;
 	}
 	
+	/**
+	 * Find any doctors in an agent's neighborhood
+	 * @return List of doctors in an agent's neighborhood
+	 */
 	protected List<Doctor> findDoctorsInRadius() {
 		GridPoint currentLocation = this.getGrid().getLocation(this);
 		GridCellNgh<Doctor> doctorNghCreator = new GridCellNgh<Doctor>(this.getGrid(), currentLocation, Doctor.class, this.getRadiusOfKnowledge(), this.getRadiusOfKnowledge());
@@ -94,11 +119,18 @@ public abstract class Human {
 		return doctorAgents;
 	}
 	
+	/**
+	 * Find the "best" gas point, i.e. the most extreme gas point in the way
+	 * of an agent's movement path
+	 * Used to keep human agents navigating towards a goal (ex. door), while
+	 * avoiding obstacles (ex. gas cloud)
+	 * @param angleB Angle at which the agent is attempting to move
+	 * @return GridPoint location of the optimal gas particle to avoid
+	 */
 	private GridPoint gasInWay(double angleB) {
 		GridPoint pt = this.getGrid().getLocation(this);
 		
-		GridCellNgh<GasParticle> nghCreator = new GridCellNgh<GasParticle>(this.getGrid(), pt, GasParticle.class, 3, 3);
-		
+		GridCellNgh<GasParticle> nghCreator = new GridCellNgh<GasParticle>(this.getGrid(), pt, GasParticle.class, 3, 3);		
 		List<GridCell<GasParticle>> gridCells = nghCreator.getNeighborhood(true);
 		
 		int currentBestX = -1;
@@ -111,6 +143,9 @@ public abstract class Human {
 				int currentX = currentGasPoint.getX();
 				int currentY = currentGasPoint.getY();
 			
+				/**
+				 * Imagining a circle of r=3 around the agent, split it into 8 45-degree segments
+				 */
 				if (angleB >= 0 && angleB <= Math.PI / 8) {
 					// check between 315 and 90
 					if (checkIfGasInBounds(currentGasPoint, pt, angleB, currentY, currentX, currentBestY, currentBestX, false, true)) {
@@ -159,6 +194,19 @@ public abstract class Human {
 		return bestGasPoint;
 	}
 	
+	/**
+	 * 
+	 * @param gas
+	 * @param human
+	 * @param originalAngle
+	 * @param height
+	 * @param length
+	 * @param bestHeight
+	 * @param bestLength
+	 * @param highHeight
+	 * @param highLength
+	 * @return
+	 */
 	private boolean checkIfGasInBounds(GridPoint gas, GridPoint human, double originalAngle,
 			int height, int length, int bestHeight, int bestLength, boolean highHeight,
 			boolean highLength) {
@@ -184,6 +232,9 @@ public abstract class Human {
 		return isInBounds;
 	}
 	
+	/*
+	 * Getters & Setters
+	 */
 	public boolean isDead() {
 		return this.dead;
 	}

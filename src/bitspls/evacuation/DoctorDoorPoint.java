@@ -4,12 +4,24 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import repast.simphony.space.continuous.NdPoint;
 
+/**
+ * Class to represent a Doctor's knowledge of a door
+ * @author Bits Please
+ *
+ */
 public class DoctorDoorPoint {
-	private NdPoint point;
-	private boolean isOvercrowded;
-	private boolean isBlocked;
-	private double lastVisit;
+	private NdPoint point;			// point where the door is located (typically not whole-number grid points)
+	private boolean isOvercrowded;  // indicates if a door is overcrowded - can become not-overcrowded over time
+	private boolean isBlocked;		// indicates if a door is blocked by gas - if blocked, it will not become unblocked
+	private double lastVisit;		// tick count for the last time a doctor visited or observed the door - indicates freshness of data compared to other doctors'
 	
+	/**
+	 * Constructor for a DoctorDoorPoint
+	 * @param point Point where a door is located
+	 * @param isOvercrowded Is the door overcrowded
+	 * @param isBlocked Is the door blocked by gas
+	 * @param lastVisit Tick count for last visit
+	 */
 	public DoctorDoorPoint(NdPoint point, boolean isOvercrowded, boolean isBlocked, double lastVisit) {
 		this.point = point;
 		this.isOvercrowded = isOvercrowded;
@@ -17,6 +29,9 @@ public class DoctorDoorPoint {
 		this.lastVisit = lastVisit;
 	}
 	
+	/*
+	 * Getters & Setters
+	 */
 	public NdPoint getPoint() {
 		return this.point;
 	}
@@ -49,6 +64,10 @@ public class DoctorDoorPoint {
 		this.lastVisit = time;
 	}
 	
+	/*
+	 * Overriding hasCode() and equals() for comparison
+	 */
+	
 	@Override
     public int hashCode() {
         return new HashCodeBuilder(23, 113).
@@ -56,6 +75,9 @@ public class DoctorDoorPoint {
             toHashCode();
     }
 	
+	/**
+	 * Compare two DoctorDoorPoints based on the point's x- and y-values
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof DoctorDoorPoint)) {

@@ -18,6 +18,17 @@ import repast.simphony.space.grid.GridDimensions;
 import repast.simphony.space.grid.GridPoint;
 import repast.simphony.util.SimUtilities;
 
+/**
+ * Class to model the Patient agent
+ * Patients move randomly until they find a doctor or a door
+ * Upon finding a doctor, they follow them to the door and exit
+ * If they find a door, they move towards the door and exit
+ * 
+ * Patients extend Human, which has some mechanics for all
+ * human agents in regards to moving & avoiding gas
+ * @author Bits Please
+ *
+ */
 public class Patient extends Human {
 	private static final int SPEED = 2;
 
@@ -31,6 +42,16 @@ public class Patient extends Human {
 	private double patientPanicWeight;
 	private double gasPanicWeight;
 	
+	/**
+	 * Constructor for Patient agent
+	 * @param space Continuous space the patient is located in
+	 * @param grid Grid the patient is located in
+	 * @param patientPanicWeight Weighting factor for the effects of other patients' panic levels
+	 * @param gasPanicWeight Weighting factor for the effects of gas on panic
+	 * @param meanPanic Mean panic level for all patients
+	 * @param stdPanic Standard deviation of panic level for all patients
+	 * @param random RNG to set this instance's starting panic level
+	 */
 	public Patient(ContinuousSpace<Object> space, Grid<Object> grid, double patientPanicWeight, double gasPanicWeight, double meanPanic, double stdPanic, Random random) {
 		this.setSpace(space);
 		this.setGrid(grid);
@@ -49,11 +70,24 @@ public class Patient extends Human {
 		this.panic = stdPanic * random.nextGaussian() + meanPanic;
 	}
 	
+	/**
+	 * Move function that is scheduled for every tick to move
+	 * the patient if it is not dead
+	 */
 	@ScheduledMethod(start = 1, interval = 1)
 	public void run() {
 		if (!isDead() && !this.exited) {
+			
+			/*
+			 * Panic level is re-evaluated based on the number and panic
+			 * level of other patients around and the amount and closeness
+			 * of gas to the patient
+			 */			
 			this.setPanic(this.calculateNewPanicLevel());
 
+			/*
+			 * Follow a doctor in the area if available
+			 */
 			if (this.doctorToFollow == null || this.door != null) {
 				Doctor targetDoctor = findDoctorWithMaxCharisma();
 				if(targetDoctor != null && shouldFollowDoctorAgent(targetDoctor)) {
@@ -64,18 +98,25 @@ public class Patient extends Human {
 				}
 			}
 			
+			/*
+			 * Look for doors in the area if the patient hasn't found one yet
+			 */
 			if (this.movementMode != PatientMode.APPROACH_DOOR) {
 				Door closestDoor = findClosestDoor();
 				if (closestDoor != null) {
 					this.door = closestDoor;
+					if (this.doctorToFollow != null) this.doctorToFollow.stopFollowing();
 					this.movementMode = PatientMode.APPROACH_DOOR;
 				}
 			}
-			
 			determineNextAction(findNextPointToMoveTo());
 		}
 	}
 	
+	/**
+	 * If there are no valid points to move to (the patient is surrounded by gas)
+	 * the patient dies, otherwise they move towards that point
+	 */
 	private void determineNextAction(GridPoint pointToMoveTo) {
 		if (pointToMoveTo != null) {
 			moveTowards(pointToMoveTo);
@@ -84,22 +125,30 @@ public class Patient extends Human {
 		}
 	}
 	
+	/**
+	 * Find the next point to move towards based on the movement mode of the patient
+	 * @return The best point to move towards
+	 */
 	private GridPoint findNextPointToMoveTo() {
 		GridPoint currentLocation = this.getGrid().getLocation(this);
 		GridPoint leastGasPoint = findLeastGasPoint(currentLocation);
 		GridPoint pointToMoveTo = null;
 		
+		// Move towards the door if available
 		if (this.movementMode == PatientMode.APPROACH_DOOR) {
 			pointToMoveTo = this.getGrid().getLocation(this.door);
-		} else if (this.movementMode == PatientMode.FOLLOW_DOCTOR && !this.doctorToFollow.isDead()) {
+		} else if (this.movementMode == PatientMode.FOLLOW_DOCTOR && !this.doctorToFollow.isDead()) {  // follow the doctor if available
 			pointToMoveTo = this.getGrid().getLocation(this.doctorToFollow);
-		} else if (leastGasPoint != null) {
+		} else if (leastGasPoint != null) { // otherwise, just avoid gas
 			pointToMoveTo = leastGasPoint;
 		}
 		
 		return pointToMoveTo;
 	}
 	
+	/**
+	 * Find a random point with no gas in it
+	 */
 	protected GridPoint findLeastGasPoint(GridPoint pt) {
 		GridCellNgh<GasParticle> nghCreator = new GridCellNgh<GasParticle>(this.getGrid(), pt, GasParticle.class, this.getRadiusOfKnowledge(), this.getRadiusOfKnowledge());
 		List<GridCell<GasParticle>> gridCells = nghCreator.getNeighborhood(true);
@@ -113,36 +162,38 @@ public class Patient extends Human {
 		}
 		return pointWithLeastGas;
 	}
-	
-	protected void moveTowards(GridPoint pt) {
-		super.moveTowards(pt);
-		
-		if (this.door != null) {
-			GridPoint currentPt = this.getGrid().getLocation(this);
-			GridCellNgh<Door> doorNghCreator = new GridCellNgh<Door>(this.getGrid(), currentPt, Door.class, 0, 0);
-			List<GridCell<Door>> doorGridCells = doorNghCreator.getNeighborhood(true);
-			GridPoint doorPt = this.getGrid().getLocation(this.door);
-			if (doorGridCells.contains(doorPt)) {
-				this.exited = true;
-				this.doctorToFollow.stopFollowing();
-				this.doctorToFollow = null;
-				this.door = null;
-				System.out.println("Patient exited");
-			}
-		}
-	}
 
+	/**
+	 * Determines if the patient should follow a given doctor
+	 * based on the doctor's charisma and patient's panic
+	 * @param doctor Doctor patient may follow
+	 * @return a boolean representing whether the patient should follow the doctor
+	 */
 	public boolean shouldFollowDoctorAgent(Doctor doctor) {
 		double probabilityOfFollowingDoctor = 0.4*doctor.getCharisma() + 0.6*(1 - getPanic());
 		System.out.println("Probability:  " + probabilityOfFollowingDoctor);
-		return randomFollowGenerator(probabilityOfFollowingDoctor);
+		boolean shouldFollow = randomFollowGenerator(probabilityOfFollowingDoctor);
+		if (!shouldFollow) {
+			System.out.println("PATIENT DIDN'T FOLLOW");
+		}
+		return shouldFollow;
 	}
 	
+	/**
+	 * If a random number passes a threshold, return true
+	 * @param probabilityTrue The threshold that the RNG must pass
+	 * @return whether the RNG > probabilityTrue
+	 */
 	public boolean randomFollowGenerator(double probabilityTrue)
 	{
 	    return Math.random() >= 1.0 - probabilityTrue;
 	}
 	
+	/**
+	 * Calculate a new panic level based on the gas around a patient
+	 * and the magnitude of patient panic around a patient
+	 * @return new panic level
+	 */
 	public double calculateNewPanicLevel() {
 		double gasFactor = calculateGasParticleFactor();
 		double patientFactor = calculateGasParticleFactor();
@@ -151,6 +202,11 @@ public class Patient extends Human {
 		return panic;
 	}
 	
+	/**
+	 * Search for the closest door inside of the patient's radius of knowledge
+	 * If there is no such door, return null
+	 * @return The closest door to the patient within it's radius of knowledge
+	 */
 	private Door findClosestDoor() {
 		GridPoint currentLocation = this.getGrid().getLocation(this);
 		GridCellNgh<Door> doorNghCreator = new GridCellNgh<Door>(this.getGrid(), currentLocation, Door.class, this.getRadiusOfKnowledge(), this.getRadiusOfKnowledge());
@@ -173,6 +229,11 @@ public class Patient extends Human {
 		return closestDoor;
 	}
 	
+	/**
+	 * Finds the best doctor to follow (the doctor with highest charisma)
+	 * inside of the patient's radius of knowledge
+	 * @return The best doctor to follow inside a neighborhood
+	 */
 	private Doctor findDoctorWithMaxCharisma() {
 		GridPoint currentLocation = this.getGrid().getLocation(this);
 		GridCellNgh<Doctor> doctorNghCreator = new GridCellNgh<Doctor>(this.getGrid(), currentLocation, Doctor.class, this.getRadiusOfKnowledge(), this.getRadiusOfKnowledge());
@@ -195,7 +256,11 @@ public class Patient extends Human {
 		return maxDoctor;
 	}
 	
-	private List<GridCell<GasParticle>> findGasAgentsInRadiusOfKnowledge () {
+	/**
+	 * Query all cells with gas particles present in the patient's radius of knowledge
+	 * @return List of all cells containing gas inside the neighborhood
+	 */
+	private List<GridCell<GasParticle>> findGasAgentsInRadiusOfKnowledge() {
 		int radiusOfKnowledge = getRadiusOfKnowledge();
 		GridPoint location = getGrid().getLocation(this);
 
@@ -213,6 +278,10 @@ public class Patient extends Human {
 		return gasAgentLocation;
 	}
 	
+	/**
+	 * Query all cells with patients present in the patient's radius of knowledge
+	 * @return List of all cells containing patients inside the neighborhood
+	 */
 	private List<Patient> findPatientAgentsInRadiusOfKnowledge() {
 		int radiusOfKnowledge = getRadiusOfKnowledge();
 		GridPoint location = getGrid().getLocation(this);
@@ -232,6 +301,10 @@ public class Patient extends Human {
 		return patientsInRadius;
 	}
 	
+	/**
+	 * Calculate portion of panic level resulting from panicked patients near patient
+	 * @return patient panic factor for panic level
+	 */
 	private double calculatePatientsPanicFactor() {
 		List<Patient> patients = findPatientAgentsInRadiusOfKnowledge();	
 		double worstCase = getWorstCase();
@@ -244,6 +317,10 @@ public class Patient extends Human {
 		}
 	}
 	
+	/**
+	 * Calculate portion of panic level resulting from panicked patients near patient
+	 * @return patient panic factor for panic level
+	 */
 	private double calculateSurroundingPatientsPanicFactor(List<Patient> patients) {
 		GridPoint currentLocation = getGrid().getLocation(this);
 		double totalPatientFactor = 0.0;
@@ -282,6 +359,10 @@ public class Patient extends Human {
 		return total/3;
 	}
 	
+	/**
+	 * Calculate portion of panic level resulting from gas near patient
+	 * @return gas factor for panic level
+	 */
 	private double calculateGasParticleFactor() {
 		List<GridCell<GasParticle>> surroundingGas = findGasAgentsInRadiusOfKnowledge();
 		//System.out.println(calculateSurroundingGasParticleFactor(surroundingGas)/worstCase);
@@ -293,6 +374,10 @@ public class Patient extends Human {
 		}
 	}
 	
+	/**
+	 * Calculate portion of panic level resulting from gas near patient
+	 * @return gas factor for panic level
+	 */
 	private double calculateSurroundingGasParticleFactor(List<GridCell<GasParticle>> gasAgents) {
 		GridPoint location = getGrid().getLocation(this);
 		double totalGasFactor = 0.0;
@@ -306,6 +391,9 @@ public class Patient extends Human {
 		return totalGasFactor;
 	}
 	
+	/*
+	 * Getters and Setters
+	 */
 	public double getPanic() {
 		return this.panic;
 	}
@@ -334,9 +422,14 @@ public class Patient extends Human {
 		this.basePanic = panic;
 	}
 	
+	/**
+	 * Enum to represent the patient's movement mode
+	 * @author Bits Please
+	 *
+	 */
 	enum PatientMode {
-		AVOID_GAS,
-		FOLLOW_DOCTOR,
-		APPROACH_DOOR
+		AVOID_GAS,		// Move randomly and avoid gas particles
+		FOLLOW_DOCTOR,  // Follow a doctor to a door
+		APPROACH_DOOR	// Approach a door and exit
 	}
 }
