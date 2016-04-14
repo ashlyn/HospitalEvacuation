@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import javafx.util.Pair;
+import repast.simphony.engine.environment.RunEnvironment;
 import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.relogo.Utility;
 import repast.simphony.space.SpatialMath;
@@ -16,7 +17,7 @@ import repast.simphony.space.grid.GridPoint;
 public class Doctor extends Human {
 	private DoctorMode doctorMode;
 	private static final int SPEED = 1;
-	private List<NdPoint> doorPoints;
+	private List<DoctorDoorPoint> doorPoints;
 	private int followers;
 	private double charisma;
 	private int stepsTakenAwayFromDoor;
@@ -35,7 +36,9 @@ public class Doctor extends Human {
 	}
 	
 	public void addDoor(NdPoint doorPoint) {
-		this.doorPoints.add(doorPoint);
+		double ticks = RunEnvironment.getInstance().getCurrentSchedule().getTickCount();
+		DoctorDoorPoint ddp = new DoctorDoorPoint(doorPoint, false, false, ticks);
+		this.doorPoints.add(ddp);
 	}
 	
 	@ScheduledMethod(start = 1, interval = SPEED)
@@ -61,9 +64,17 @@ public class Doctor extends Human {
 	private void exchangeInformationWithDoctors() {
 		List<Doctor> doctorsInRadius = super.findDoctorsInRadius();
 		for(Doctor doc : doctorsInRadius) {
-			for(NdPoint door : doc.doorPoints) {
+			for(DoctorDoorPoint door : doc.doorPoints) {
 				if (!this.doorPoints.contains(door)) {
 					this.doorPoints.add(door);
+				}
+				for (DoctorDoorPoint myDoor : this.doorPoints) {
+					if (!myDoor.isOvercrowded()) {
+						myDoor.setOvercrowded(door.isOvercrowded() && door.getLastVisitedTime() >= myDoor.getLastVisitedTime());
+					}
+					if (!myDoor.isBlocked()) {
+						myDoor.setBlocked(door.isBlocked());
+					}
 				}
 			}
 		}
@@ -113,11 +124,11 @@ public class Doctor extends Human {
 		
 		double closestDoorDistance = Double.POSITIVE_INFINITY;
 		NdPoint closestDoor = null;
-		for (NdPoint doorPoint : doorPoints) {
-			double distance = Math.sqrt(Math.pow(doorPoint.getX() - pt.getX(), 2)
-					+ Math.pow(doorPoint.getY() - pt.getY(), 2));
-			if (distance < closestDoorDistance) {
-				closestDoor = doorPoint;
+		for (DoctorDoorPoint doorPoint : doorPoints) {
+			double distance = Math.sqrt(Math.pow(doorPoint.getPoint().getX() - pt.getX(), 2)
+					+ Math.pow(doorPoint.getPoint().getY() - pt.getY(), 2));
+			if (distance < closestDoorDistance && !doorPoint.isBlocked() && !doorPoint.isOvercrowded()) {
+				closestDoor = doorPoint.getPoint();
 				closestDoorDistance = distance;
 			}
 		}
