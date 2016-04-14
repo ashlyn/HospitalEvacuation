@@ -57,7 +57,6 @@ public class Patient extends Human {
 			if (this.doctorToFollow == null || this.door != null) {
 				Doctor targetDoctor = findDoctorWithMaxCharisma();
 				if(targetDoctor != null && shouldFollowDoctorAgent(targetDoctor)) {
-					System.out.println("Followed Doctor");
 					this.doctorToFollow = targetDoctor;
 					this.doctorToFollow.startFollowing();
 					this.movementMode = PatientMode.FOLLOW_DOCTOR;
@@ -113,14 +112,12 @@ public class Patient extends Human {
 				this.doctorToFollow.stopFollowing();
 				this.doctorToFollow = null;
 				this.door = null;
-				System.out.println("Patient exited");
 			}
 		}
 	}
 
 	public boolean shouldFollowDoctorAgent(Doctor doctor) {
 		double probabilityOfFollowingDoctor = 0.4*doctor.getCharisma() + 0.6*(1 - getPanic());
-		System.out.println("Probability:  " + probabilityOfFollowingDoctor);
 		return randomFollowGenerator(probabilityOfFollowingDoctor);
 	}
 	
@@ -133,7 +130,6 @@ public class Patient extends Human {
 		double gasFactor = calculateGasParticleFactor();
 		double patientFactor = calculateGasParticleFactor();
 		double panic = this.basePanic + (this.patientPanicWeight * patientFactor) + (this.gasPanicWeight * gasFactor) ;
-		System.out.println("new panic: " + panic);
 		return panic;
 	}
 	
@@ -237,12 +233,9 @@ public class Patient extends Human {
 		for(Patient patient: patients) {
 			GridPoint pt = getGrid().getLocation(patient);
 			double distance = getGrid().getDistance(currentLocation, pt);
-			//System.out.println("distance: " + distance);
 			if (distance != 0) {
-				//System.out.println("panic: " + patient.getPanic());
 				totalPatientFactor += patient.getPanic()/distance;
 			}
-			//System.out.println("totalPatientFactor: " + totalPatientFactor);
 		}
 		
 		return totalPatientFactor;
@@ -270,7 +263,6 @@ public class Patient extends Human {
 	
 	private double calculateGasParticleFactor() {
 		List<GridCell<GasParticle>> surroundingGas = findGasAgentsInRadiusOfKnowledge();
-		//System.out.println(calculateSurroundingGasParticleFactor(surroundingGas)/worstCase);
 		double surroundingFactor = calculateSurroundingGasParticleFactor(surroundingGas);
 		if(surroundingFactor > worstCase) {
 			return 1;
