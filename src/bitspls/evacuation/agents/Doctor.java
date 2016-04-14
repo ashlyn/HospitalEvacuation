@@ -84,7 +84,6 @@ public class Doctor extends Human {
             if(shouldExit()) {
                 this.doctorMode = DoctorMode.ESCAPE;
                 moveTowardsDoor();
-                System.out.println("here");
             }
             else {
                 updateDoorKnowledge();
@@ -217,7 +216,6 @@ public class Doctor extends Human {
         if (closestDoorDistance < 3) {
             if(isGasInRadius(5)) {
                 doctorMode = DoctorMode.ESCAPE;
-                System.out.println("escape");
             }
             else {
                 doctorMode = DoctorMode.PATIENT_SEEK;
@@ -465,7 +463,6 @@ public class Doctor extends Human {
     	Context<Object> context = ContextUtils.getContext(this);
     	int humanCount = context.getObjects(Doctor.class).size() + context.getObjects(Patient.class).size();
     	
-    	System.out.println(humanCount + " agents remaining");
     	if (humanCount > 1) {
 	    	GridPoint pt = this.getGrid().getLocation(this);
 	    	NdPoint spacePt = new NdPoint(pt.getX(), pt.getY());
