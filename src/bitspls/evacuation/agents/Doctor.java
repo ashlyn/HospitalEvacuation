@@ -3,6 +3,7 @@ package bitspls.evacuation.agents;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import javafx.util.Pair;
 import repast.simphony.engine.schedule.ScheduledMethod;
@@ -20,7 +21,7 @@ public class Doctor extends Human {
 	private int followers;
 	private double charisma;
 	
-	public Doctor(ContinuousSpace<Object> space, Grid<Object> grid) {
+	public Doctor(ContinuousSpace<Object> space, Grid<Object> grid, double meanCharisma, double stdCharisma, Random random) {
 		this.setSpace(space);
 		this.setGrid(grid);
 		this.setDead(false);
@@ -28,7 +29,7 @@ public class Doctor extends Human {
 		this.setSpeed(SPEED);
 		this.doorPoints = new ArrayList<>();
 		this.followers = 0;
-		this.charisma = .5;
+		this.charisma = stdCharisma * random.nextGaussian() + meanCharisma;
 		this.doctorMode = DoctorMode.DOOR_SEEK;
 	}
 	
@@ -39,6 +40,7 @@ public class Doctor extends Human {
 	@ScheduledMethod(start = 1, interval = SPEED)
 	public void run() {
 		if (!isDead()) {
+			exchangeInformationWithDoctors();
 			if (doctorMode == DoctorMode.PATIENT_SEEK) {
 				findPatients();
 			} else {
@@ -73,6 +75,17 @@ public class Doctor extends Human {
 		super.moveTowards(point);
 	}
 	
+	private void exchangeInformationWithDoctors() {
+		List<Doctor> doctorsInRadius = super.findDoctorsInRadius();
+		for(Doctor doc : doctorsInRadius) {
+			for(NdPoint door : doc.doorPoints) {
+				if (!this.doorPoints.contains(door)) {
+					this.doorPoints.add(door);
+				}
+			}
+		}
+	}
+	
 	private void moveTowardsDoor() {
 		Pair<Double, GridPoint> distancePointPair = findClosestDoor();
 		
@@ -81,6 +94,7 @@ public class Doctor extends Human {
 		
 		if (closestDoorDistance < 3) {
 			doctorMode = DoctorMode.PATIENT_SEEK;
+
 		}
 		
 		if (closestDoorPoint != null) {

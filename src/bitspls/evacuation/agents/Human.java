@@ -1,5 +1,6 @@
 package bitspls.evacuation.agents;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import repast.simphony.query.space.grid.GridCell;
@@ -62,7 +63,7 @@ public abstract class Human {
 	
 	protected GridPoint findLeastGasPoint(GridPoint pt) {
 		GridCellNgh<GasParticle> nghCreator = new GridCellNgh<GasParticle>(this.getGrid(), pt, GasParticle.class, this.getRadiusOfKnowledge(), this.getRadiusOfKnowledge());
-		List<GridCell<GasParticle>> gridCells = nghCreator.getNeighborhood(false);
+		List<GridCell<GasParticle>> gridCells = nghCreator.getNeighborhood(true);
 		SimUtilities.shuffle(gridCells, RandomHelper.getUniform());
 		
 		GridPoint pointWithLeastGas = null;
@@ -72,6 +73,24 @@ public abstract class Human {
 			}
 		}
 		return pointWithLeastGas;
+	}
+	
+	protected List<Doctor> findDoctorsInRadius() {
+		GridPoint currentLocation = this.getGrid().getLocation(this);
+		GridCellNgh<Doctor> doctorNghCreator = new GridCellNgh<Doctor>(this.getGrid(), currentLocation, Doctor.class, this.getRadiusOfKnowledge(), this.getRadiusOfKnowledge());
+		List<GridCell<Doctor>> doctorGridCells = doctorNghCreator.getNeighborhood(true);
+		SimUtilities.shuffle(doctorGridCells, RandomHelper.getUniform());
+		
+		List<Doctor> doctorAgents = new ArrayList<Doctor>();
+		for (GridCell<Doctor> cell : doctorGridCells) {
+			if (cell.size() > 0) {
+				for (Doctor doc : cell.items()) {
+					doctorAgents.add(doc);
+				}
+			}
+		}
+		
+		return doctorAgents;
 	}
 	
 	private GridPoint gasInWay(double angleB) {
