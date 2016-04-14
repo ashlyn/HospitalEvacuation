@@ -3,12 +3,7 @@ package bitspls.evacuation;
 import java.util.ArrayList;
 import java.util.List;
 
-import bitspls.evacuation.agents.Doctor;
-import bitspls.evacuation.agents.Doctor.DoctorMode;
-import bitspls.evacuation.agents.GasParticle;
-import bitspls.evacuation.agents.Patient;
 import repast.simphony.context.Context;
-import repast.simphony.engine.environment.RunEnvironment;
 import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.query.space.grid.GridCell;
 import repast.simphony.query.space.grid.GridCellNgh;
@@ -18,7 +13,14 @@ import repast.simphony.space.grid.Grid;
 import repast.simphony.space.grid.GridPoint;
 import repast.simphony.util.ContextUtils;
 import repast.simphony.util.SimUtilities;
+import bitspls.evacuation.agents.Doctor;
+import bitspls.evacuation.agents.Doctor.DoctorMode;
+import bitspls.evacuation.agents.Patient;
 
+/**
+ * Class to represent a door in the hospital environment
+ * @author Bits Please
+ */
 public class Door {
     private ContinuousSpace<Object> space;
     private Grid<Object> grid;
@@ -26,6 +28,16 @@ public class Door {
     private int overcrowding;
     private int blocked;
     
+    /**
+	 * Constructor for Door
+	 * @param space Space in which the door is located
+	 * @param grid Grid in which the door is located
+	 * @param radius Radius of knowledge of the door
+	 * @param overcrowding Number of patients needed for a door to
+	 * be overcrowded
+	 * @param blocked Number of gas particles needed to determine
+	 * if a door is blocked
+	 */
     public Door(ContinuousSpace<Object> space, Grid<Object> grid, int radius, int overcrowding, int blocked) {
         this.space = space;
         this.grid = grid;
@@ -46,6 +58,10 @@ public class Door {
         return this.blocked;
     }
 
+    /**
+     * Removes patients or doctors from the context every tick if there
+     * are patients or doctors trying to exit
+     */
     @ScheduledMethod(start = 1, interval = 1)
     public void allowPatientsOrDoctorsToExit() {
         List<Patient> patients = findExitingPatients();
@@ -55,9 +71,12 @@ public class Door {
         if(patients.size() == 0) {
             allowDoctorsToExit(doctors);
         }
-
     }
     
+    /**
+     * Attempt to find patients trying to exit
+     * @return The list of patients trying to exit
+     */
     private List<Patient> findExitingPatients() {
         GridPoint pt = this.grid.getLocation(this);
         GridCellNgh<Patient> nghCreator = new GridCellNgh<Patient>(this.grid, pt, Patient.class, 1, 1);
@@ -74,6 +93,10 @@ public class Door {
         return patients;
     }
     
+    /**
+     * Attempt to find the exiting doctors
+     * @return The list of doctors trying to exit
+     */
     private List<Doctor> findExitingDoctors() {
         GridPoint pt = this.grid.getLocation(this);
         GridCellNgh<Doctor> nghCreator = new GridCellNgh<Doctor>(this.grid, pt, Doctor.class, 1, 1);
@@ -92,6 +115,10 @@ public class Door {
         return doctors;
     }
     
+    /** 
+     * Randomly select and remove two patients who are trying to exit
+     * @param patients The list of patients trying to exit
+     */
     private void allowPatientsToExit(List<Patient> patients) {
         Context<Object> context = ContextUtils.getContext(this);
         if (patients.size() > 2) {
@@ -107,6 +134,10 @@ public class Door {
         }
     }
     
+    /**
+     * Randomly select and remove two doctors who are trying to exit
+     * @param doctors The list of doctors trying to exit
+     */
     private void allowDoctorsToExit(List<Doctor> doctors) {
         Context<Object> context = ContextUtils.getContext(this);
         if (doctors.size() > 2) {

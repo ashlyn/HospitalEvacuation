@@ -24,15 +24,38 @@ import repast.simphony.util.ContextUtils;
 import repast.simphony.util.SimUtilities;
 import repast.simphony.query.space.grid.GridCell;
 
+/**
+ * Class to model the Doctor agent
+ * Doctors initially attempt to avoid gas and when
+ * they encounter patients, they lead the patients
+ * to one of the doors they have knowledge of, then
+ * continue exploring the space
+ * 
+ * Doctors have the ability to learn about other doors
+ * in the system from encountering them or by communicating
+ * with other doctors who share their knowledge
+ * 
+ * Doctors extend Human, which has some mechanics for all
+ * human agents in regards to moving & avoiding gas
+ * @author Bits Please
+ *
+ */
 public class Doctor extends Human {
-
-    private DoctorMode doctorMode;
-    private static final int SPEED = 1;
-    private List<DoctorDoorPoint> doorPoints;
-    private int followers;
-    private double charisma;
+	private DoctorMode doctorMode;
+	private static final int SPEED = 1;
+	private List<DoctorDoorPoint> doorPoints;
+	private int followers;
+	private double charisma;
     private GridPoint lastPointMovedTowards;
     
+    /**
+	 * Constructor for Doctor agent
+	 * @param space The continuous space in which the agent is located
+	 * @param grid The grid in which the agent is located
+	 * @param meanCharisma The mean charisma level for all doctors
+	 * @param stdCharisma The standard deviation of charisma for all doctors
+	 * @param random An RNG to set this instance's charisma
+	 */
     public Doctor(ContinuousSpace<Object> space, Grid<Object> grid, double meanCharisma, double stdCharisma, Random random) {
         this.setSpace(space);
         this.setGrid(grid);
@@ -45,12 +68,19 @@ public class Doctor extends Human {
         this.doctorMode = DoctorMode.DOOR_SEEK;
     }
     
+    /**
+	 * Adds a door to the doctor's knowledge
+	 * @param doorPoint Point where the door is located
+	 */
     public void addDoor(NdPoint doorPoint, DoorPointEnum status) {
         double ticks = RunEnvironment.getInstance().getCurrentSchedule().getTickCount();
         DoctorDoorPoint ddp = new DoctorDoorPoint(doorPoint, status, ticks);
         this.doorPoints.add(ddp);
     }
     
+    /**
+	 * Scheduled method to move a doctor if they are still alive
+	 */
     @ScheduledMethod(start = 1, interval = SPEED)
     public void run() {
         if (!isDead()) {
@@ -105,14 +135,25 @@ public class Doctor extends Human {
         return num;
     }
 
-    private void findPatients() {
-    	if (lastPointMovedTowards != null && Math.random() > .15) {
+    /**
+	 * Moves a doctor away from a door if they have just
+	 * dropped off patients and moves them randomly to 
+	 * explore for more patients if not actively leading.
+	 * Attempts to allow doctors to move in a more consistent
+	 * manner by following a previous path rather than
+	 * choosing a new path.
+	 */
+	private void findPatients() {
+		if (lastPointMovedTowards != null && Math.random() > .15) {
     		super.moveTowards(lastPointMovedTowards);
     	} else {
     		moveRandomly();
     	}
-    }
+	}
 
+    /**
+	 * Move towards a random point
+	 */
     private void moveRandomly() {
         GridPoint pt = this.getGrid().getLocation(this);
 
@@ -140,6 +181,10 @@ public class Doctor extends Human {
         }
     }
     
+    /**
+	 * Exchanges information of doors with other doctors
+	 * in this doctor's neighborhood
+	 */
     private void exchangeInformationWithDoctors() {
         List<Doctor> doctorsInRadius = super.findDoctorsInRadius();
         for(Doctor doc : doctorsInRadius) {
@@ -162,6 +207,10 @@ public class Doctor extends Human {
         }
     }
 
+    /**
+	 * Move towards a the closest available (unblocked and not overcrowded)
+	 * door if leading patients
+	 */
     private void moveTowardsDoor() {
         Pair<Double, GridPoint> distancePointPair = findClosestAvailableDoor();
         
@@ -185,7 +234,12 @@ public class Doctor extends Human {
         }
     }
     
-    private Boolean isGasInRadius(int radius) {
+    /**
+     * Check if gas is near the door
+     * @param radius The radius to check for gas
+     * @return Where gas is near the door
+     */
+    private boolean isGasInRadius(int radius) {
         Boolean gasIsPresent = false;
         GridPoint location = this.getGrid().getLocation(this);
         GridCellNgh<GasParticle> nghCreator = new GridCellNgh<GasParticle>(this.getGrid(), location, GasParticle.class, radius, radius);
@@ -201,6 +255,11 @@ public class Doctor extends Human {
         return gasIsPresent;
     }
 
+    /**
+     * Updates the doctors knowledge of specific doors by updating 
+     * the status of doors or adding the doors to the list of
+     * known doors for the doctor
+     */
     private void updateDoorKnowledge() {
         List<Door> doorsInRadius = findDoorsInRadius();
 
@@ -238,7 +297,11 @@ public class Doctor extends Human {
         }
     }
 
-    
+    /**
+     * Determine if there are new doors nearby that can be used
+     * in the future
+     * @return The list of doors near the doctor
+     */
     private List<Door> findDoorsInRadius() {
         GridPoint location = this.getGrid().getLocation(this);
         GridCellNgh<Door> nghCreator = new GridCellNgh<Door>(this.getGrid(), location, Door.class, this.getRadiusOfKnowledge(), this.getRadiusOfKnowledge());
@@ -258,7 +321,13 @@ public class Doctor extends Human {
         return doors;
     }
     
-    private Boolean isDoorOvercrowded(Door door) {
+    /**
+     * Checks if the number of patients near a door exceeds the threshold
+     * for that door
+     * @param door The door to check for overcrowding
+     * @return boolean indication whether the door is overcrowded
+     */
+    private boolean isDoorOvercrowded(Door door) {
         GridPoint location = this.getGrid().getLocation(door);
         GridCellNgh<Patient> nghCreator = new GridCellNgh<Patient>(this.getGrid(), location, Patient.class, door.getRadius(), door.getRadius());
         List<GridCell<Patient>> gridCells = nghCreator.getNeighborhood(true);
@@ -277,7 +346,13 @@ public class Doctor extends Human {
         return true;
     }
     
-    private Boolean isDoorBlocked(Door door) {
+    /**
+     * Checks if a door is blocked by gas by comparing the number of gas
+     * particles near the door to the blocking threshold
+     * @param door The door to check
+     * @return Whether the door is blocked
+     */
+    private boolean isDoorBlocked(Door door) {
         GridPoint location = this.getGrid().getLocation(door);
         GridCellNgh<GasParticle> nghCreator = new GridCellNgh<GasParticle>(this.getGrid(), location, GasParticle.class, door.getRadius(), door.getRadius());
         List<GridCell<GasParticle>> gridCells = nghCreator.getNeighborhood(true);
@@ -297,6 +372,10 @@ public class Doctor extends Human {
         return true;
     }
     
+    /**
+	 * Finds the closest available door to this doctor
+	 * @return A key-value pair of the distance and the grid point corresponding to the door
+	 */
     private Pair<Double, GridPoint> findClosestAvailableDoor() {
         GridPoint pt = this.getGrid().getLocation(this);
         
@@ -326,6 +405,10 @@ public class Doctor extends Human {
         return new Pair<Double, GridPoint>(closestDoorDistance, closestDoorPoint);
     }
     
+    /**
+     * Look for a door that was previously overcrowded and attempt to use it
+     * @return The location of the door to use
+     */
     private NdPoint findClosestOvercrowdedDoor() {
         NdPoint closestDoor = null;
         double closestDistance = Double.POSITIVE_INFINITY;
@@ -342,18 +425,32 @@ public class Doctor extends Human {
         return closestDoor;
     }
 
-    public void startFollowing() {
-        this.followers++;
-        doctorMode = DoctorMode.DOOR_SEEK;
-    }
-    
-    public void stopFollowing() {
-        this.followers--;
-    }
-    
-    public int getFollowers() {
-        return this.followers;
-    }
+    /**
+	 * Begin following this doctor
+	 * Increment the followers counter and send the doctor towards a door
+	 */
+	public void startFollowing() {
+		this.followers++;
+		doctorMode = DoctorMode.DOOR_SEEK;
+	}
+	
+	/**
+	 * Stop following a doctor. If that was the last patient following,
+	 * send the doctor to find more patients
+	 */
+	public void stopFollowing() {
+		this.followers--;
+		if (followers <= 0) {
+			doctorMode = DoctorMode.PATIENT_SEEK;
+		}
+	}
+	
+	/*
+	 * Getters and setters for charisma, followers
+	 */
+	public int getFollowers() {
+		return this.followers;
+	}
 
     public double getCharisma() {
         return this.charisma;
@@ -362,7 +459,10 @@ public class Doctor extends Human {
     public void setCharisma(double charisma) {
         this.charisma = charisma;
     }
-    
+
+    /**
+     * Kill a doctor by removing it from the context
+     */
     public void kill() {
     	super.kill();
     	Context<Object> context = ContextUtils.getContext(this);
@@ -387,10 +487,14 @@ public class Doctor extends Human {
     public DoctorMode getMode() {
         return this.doctorMode;
     }
-    
-    public enum DoctorMode {
-        DOOR_SEEK,
-        PATIENT_SEEK,
-        ESCAPE
-    }
+	
+	/**
+	 * Enum to represent the state of a doctor
+	 * @author Bits Please
+	 */
+	public enum DoctorMode {
+		DOOR_SEEK,  	// should move towards closest available door
+		PATIENT_SEEK,	// should look for patients while avoiding gas
+		ESCAPE			// move to door and exit
+	}
 }
