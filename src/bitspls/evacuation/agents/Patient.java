@@ -100,20 +100,6 @@ public class Patient extends Human {
 		return pointToMoveTo;
 	}
 	
-	protected GridPoint findLeastGasPoint(GridPoint pt) {
-		GridCellNgh<GasParticle> nghCreator = new GridCellNgh<GasParticle>(this.getGrid(), pt, GasParticle.class, this.getRadiusOfKnowledge(), this.getRadiusOfKnowledge());
-		List<GridCell<GasParticle>> gridCells = nghCreator.getNeighborhood(true);
-		SimUtilities.shuffle(gridCells, RandomHelper.getUniform());
-		
-		GridPoint pointWithLeastGas = null;
-		for (GridCell<GasParticle> cell : gridCells) {
-			if (cell.size() == 0) {
-				pointWithLeastGas = cell.getPoint();
-			}
-		}
-		return pointWithLeastGas;
-	}
-	
 	protected void moveTowards(GridPoint pt) {
 		super.moveTowards(pt);
 		
