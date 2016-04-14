@@ -1,4 +1,4 @@
-package bitspls.evacuation.agents;
+package bitspls.evacuation;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
