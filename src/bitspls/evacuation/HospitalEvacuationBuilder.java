@@ -75,7 +75,7 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 		int blockedThreshold = params.getInteger("blocked_threshold");
         int doorRadius = params.getInteger("door_radius");
         
-        int doorCount = params.getInteger("door_count");
+        int doorCount = 5;
         for (int i = 0; i < doorCount; i++) {
             Door door = new Door(space, grid, doorRadius, overcrowdingThreshold, blockedThreshold);
             context.add(door);
