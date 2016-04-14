@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import repast.simphony.context.Context;
+import repast.simphony.context.ContextListener;
 import repast.simphony.context.space.continuous.ContinuousSpaceFactory;
 import repast.simphony.context.space.continuous.ContinuousSpaceFactoryFinder;
 import repast.simphony.context.space.grid.GridFactory;
@@ -127,7 +128,7 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 		for (Doctor doctor : doctors) {
 			findClosestThreeDoors(doctor, doors, space);
 		}
-		
+				
 		return context;
 	}
 	

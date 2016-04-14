@@ -8,14 +8,18 @@ import bitspls.evacuation.Door;
 import bitspls.evacuation.agents.Doctor;
 import bitspls.evacuation.agents.GasParticle;
 import bitspls.evacuation.agents.Human;
+import repast.simphony.context.Context;
+import repast.simphony.engine.environment.RunEnvironment;
 import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.query.space.grid.GridCell;
 import repast.simphony.query.space.grid.GridCellNgh;
 import repast.simphony.random.RandomHelper;
 import repast.simphony.space.continuous.ContinuousSpace;
+import repast.simphony.space.continuous.NdPoint;
 import repast.simphony.space.grid.Grid;
 import repast.simphony.space.grid.GridDimensions;
 import repast.simphony.space.grid.GridPoint;
+import repast.simphony.util.ContextUtils;
 import repast.simphony.util.SimUtilities;
 
 /**
@@ -419,6 +423,35 @@ public class Patient extends Human {
 	public void setBasePanic(double panic) {
 		this.basePanic = panic;
 	}
+	
+	/**
+	 * Kill a patient by removing it from the context
+	 */
+	public void kill() {
+    	super.kill();
+
+    	/*
+    	 *  Note: We are not giving the agent global knowledge of the other agents in the system
+    	 *  These counts are only to stop the simulation when no human agents remain
+    	 */
+    	Context<Object> context = ContextUtils.getContext(this);
+    	int humanCount = context.getObjects(Doctor.class).size() + context.getObjects(Patient.class).size();
+    	
+    	System.out.println(humanCount + " agents remaining");
+    	if (humanCount > 1) {
+	    	GridPoint pt = this.getGrid().getLocation(this);
+	    	NdPoint spacePt = new NdPoint(pt.getX(), pt.getY());
+	
+			DeadPatient deadPatient = new DeadPatient();
+			context.add(deadPatient);
+			this.getSpace().moveTo(deadPatient, spacePt.getX(), spacePt.getY());
+			this.getGrid().moveTo(deadPatient, pt.getX(), pt.getY());
+			
+			context.remove(this);
+    	} else {
+    		RunEnvironment.getInstance().endRun();
+    	}
+    }
 	
 	/**
 	 * Enum to represent the patient's movement mode
