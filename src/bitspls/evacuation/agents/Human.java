@@ -192,24 +192,21 @@ public abstract class Human {
 	 * the door from the doctor's current location
 	 * @param gas The gas point to compare to the bounds
 	 * @param human The location of the doctor
-	 * @param originalAngle The angle of the vector to the door
-	 * @param height The "height" distance away from the doctor
-	 * This indicates a relative height as if the current angle were rotated
-	 * to exist in 0-45 degrees
-	 * @param length The "length" distance away from the doctor
-	 * This indicates a relative length as if the current angle were rotated
-	 * to exist in 0-45 degrees
-	 * @param bestHeight The current closest gas particle's height from the doctor
-	 * @param bestLength The current closest gas particle's lateral distance from the doctor
-	 * @param highHeight Indicates if we want the max or min height of the gas particles as
-	 * our best particle
-	 * @param highLength Indicates if we want the max or min length of the gas particles as
-	 * our best particle
+	 * @param angleTowardsDoor The angle the patient must travel on to get to the door
+	 * @param verticalLocation The relative vertical location to the doctor
+	 * @param horizontalLocation The relative horizontal location to the doctor
+	 * @param bestVerticalLocation The current closest gas's vertical location
+	 * @param bestHorizontalLocation The current closest gas's horizontal location
+	 * @param maximizeVerticalLocation Indicates if we want the max or min vertial
+	 * location of the gas particles as our best particle
+	 * @param maximizeHorizontalLocation highLength Indicates if we want the max or
+	 * min horizontal location of the gas particles as our best particle
 	 * @return Whether or not the gas was in the way of the doctor's current path
 	 */
-	private boolean checkIfGasInBounds(GridPoint gas, GridPoint human, double originalAngle,
-			int height, int length, int bestHeight, int bestLength, boolean highHeight,
-			boolean highLength) {
+	private boolean checkIfGasInBounds(GridPoint gas, GridPoint human, double angleTowardsDoor,
+			int verticalLocation, int horizontalLocation, int bestVerticalLocation,
+			int bestHorizontalLocation, boolean maximizeVerticalLocation,
+			boolean maximizeHorizontalLocation) {
 		
 		boolean isInBounds = false;
 		
@@ -217,14 +214,16 @@ public abstract class Human {
 		NdPoint gasPoint = new NdPoint(gas.getX(), gas.getY());
 		double angle = SpatialMath.calcAngleFor2DMovement(space, humanPoint, gasPoint);
 		
-		if (angle >= originalAngle - (Math.PI / 2) && angle <= originalAngle + (Math.PI / 2)) {
+		if (angle >= angleTowardsDoor - (Math.PI / 2) && angle <= angleTowardsDoor + (Math.PI / 2)) {
 			 
-			if (highHeight && (height > bestHeight) || (!highHeight && height < bestHeight)) {
+			if (maximizeVerticalLocation && (verticalLocation > bestVerticalLocation)
+					|| (!maximizeVerticalLocation && verticalLocation < bestVerticalLocation)) {
 				isInBounds = true;
-			} else if (height == bestHeight && (highLength && length > bestLength)
-					|| (!highLength && length < bestLength)) {
+			} else if (verticalLocation == bestVerticalLocation
+					&& (maximizeHorizontalLocation && horizontalLocation > bestHorizontalLocation
+							|| (!maximizeHorizontalLocation && horizontalLocation < bestHorizontalLocation))) {
 				isInBounds = true;
-			} else if (bestHeight == -1) {
+			} else if (bestVerticalLocation == -1) {
 				isInBounds = true;
 			}
 		}
