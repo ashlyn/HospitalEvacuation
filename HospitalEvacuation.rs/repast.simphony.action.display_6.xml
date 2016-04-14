@@ -3,6 +3,14 @@
   <type>2D</type>
   <styles>
     <entry>
+      <string>bitspls.evacuation.agents.DeadDoctor</string>
+      <string>repast.simphony.visualization.editedStyle.EditedStyle2D</string>
+    </entry>
+    <entry>
+      <string>bitspls.evacuation.agents.DeadPatient</string>
+      <string>repast.simphony.visualization.editedStyle.EditedStyle2D</string>
+    </entry>
+    <entry>
       <string>bitspls.evacuation.agents.Doctor</string>
       <string>repast.simphony.visualization.editedStyle.EditedStyle2D</string>
     </entry>
@@ -20,6 +28,14 @@
     </entry>
   </styles>
   <editedStyles>
+    <entry>
+      <string>bitspls.evacuation.agents.DeadDoctor</string>
+      <string>bitspls.evacuation.agents.DeadDoctor.style_0.xml</string>
+    </entry>
+    <entry>
+      <string>bitspls.evacuation.agents.DeadPatient</string>
+      <string>bitspls.evacuation.agents.DeadPatient.style_0.xml</string>
+    </entry>
     <entry>
       <string>bitspls.evacuation.agents.Doctor</string>
       <string>bitspls.evacuation.agents.Doctor.style_0.xml</string>
@@ -47,15 +63,23 @@
     <pType>LAST</pType>
     <duration>-1.0</duration>
     <frequency>REPEAT</frequency>
-    <hashCode>1578851614</hashCode>
+    <hashCode>1189439156</hashCode>
   </schedParams>
   <layoutClassName>foo.bar.baz</layoutClassName>
   <layoutProjection>space</layoutProjection>
   <layoutInterval>0</layoutInterval>
   <layerOrder>
     <entry>
-      <string>bitspls.evacuation.agents.Doctor</string>
+      <string>bitspls.evacuation.agents.DeadDoctor</string>
       <int>2</int>
+    </entry>
+    <entry>
+      <string>bitspls.evacuation.agents.DeadPatient</string>
+      <int>1</int>
+    </entry>
+    <entry>
+      <string>bitspls.evacuation.agents.Doctor</string>
+      <int>4</int>
     </entry>
     <entry>
       <string>bitspls.evacuation.agents.GasParticle</string>
@@ -63,11 +87,11 @@
     </entry>
     <entry>
       <string>bitspls.evacuation.agents.Patient</string>
-      <int>1</int>
+      <int>3</int>
     </entry>
     <entry>
       <string>bitspls.evacuation.Door</string>
-      <int>3</int>
+      <int>5</int>
     </entry>
   </layerOrder>
   <projections>
