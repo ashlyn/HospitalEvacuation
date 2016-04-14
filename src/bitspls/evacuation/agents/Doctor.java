@@ -99,7 +99,7 @@ public class Doctor extends Human {
     }
     
     private boolean shouldExit() {
-        if (findNumberOfUnblockedDoors() == 1 || (isGasInRadius(7) && isDoorInRadius(7))) {
+        if (findNumberOfUnblockedDoors() == 1 || (isGasInRadius(10) && isDoorInRadius(10))) {
             return true;
         }
         
@@ -465,7 +465,6 @@ public class Doctor extends Human {
     	Context<Object> context = ContextUtils.getContext(this);
     	int humanCount = context.getObjects(Doctor.class).size() + context.getObjects(Patient.class).size();
     	
-    	System.out.println(humanCount + " agents remaining");
     	if (humanCount > 1) {
 	    	GridPoint pt = this.getGrid().getLocation(this);
 	    	NdPoint spacePt = new NdPoint(pt.getX(), pt.getY());

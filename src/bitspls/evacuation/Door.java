@@ -4,15 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import repast.simphony.context.Context;
+import repast.simphony.engine.environment.RunEnvironment;
 import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.query.space.grid.GridCell;
 import repast.simphony.query.space.grid.GridCellNgh;
 import repast.simphony.random.RandomHelper;
 import repast.simphony.space.continuous.ContinuousSpace;
+import repast.simphony.space.continuous.NdPoint;
 import repast.simphony.space.grid.Grid;
 import repast.simphony.space.grid.GridPoint;
 import repast.simphony.util.ContextUtils;
 import repast.simphony.util.SimUtilities;
+import bitspls.evacuation.agents.DeadDoctor;
 import bitspls.evacuation.agents.Doctor;
 import bitspls.evacuation.agents.Doctor.DoctorMode;
 import bitspls.evacuation.agents.Patient;
@@ -132,6 +135,11 @@ public class Door {
                 context.remove(p);
             }
         }
+        
+    	int humanCount = context.getObjects(Doctor.class).size() + context.getObjects(Patient.class).size();
+    	if (humanCount == 0) {
+    		RunEnvironment.getInstance().endRun();
+    	}
     }
     
     /**
@@ -151,5 +159,10 @@ public class Door {
                 context.remove(d);
             }
         }
+        
+        int humanCount = context.getObjects(Doctor.class).size() + context.getObjects(Patient.class).size();
+    	if (humanCount == 0) {
+    		RunEnvironment.getInstance().endRun();
+    	}
     }
 }
