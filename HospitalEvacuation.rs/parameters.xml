@@ -7,7 +7,7 @@
 									
 		/>
 				<parameter name="mean_panic" displayName="Mean Patient Panic" type="double" 
-						defaultValue="50.0" 
+						defaultValue="0.5" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
 									
@@ -25,7 +25,7 @@
 									
 		/>
 				<parameter name="std_charisma" displayName="StdDev Doctor Charisma" type="double" 
-						defaultValue="5.0" 
+						defaultValue="0.05" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
 									
@@ -43,7 +43,7 @@
 									
 		/>
 				<parameter name="std_panic" displayName="StdDev Patient Panic" type="double" 
-						defaultValue="10.0" 
+						defaultValue="0.1" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
 									
@@ -61,7 +61,7 @@
 									
 		/>
 				<parameter name="mean_charisma" displayName="Mean Doctor Charisma" type="double" 
-						defaultValue="50.0" 
+						defaultValue="0.5" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
 									
