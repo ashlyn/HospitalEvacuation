@@ -16,7 +16,21 @@ spreading gas is represented as a light blue cluster.
 ### Other Information
 A variety of parameters can be set from within the GUI. Namely, the number of doctors and patients and the means and standard deviations
 for the doctor charisma and starting patient panic levels. These parameters allow you to run the simulation under a variety of conditions
-and will allow us to adjust the independent variables in our experiements.
+and will allow us to adjust the independent variables in our experiements. The list of parameters and their definitions are below.
+
+## Parameters
+- Starting Panic: the starting panic level of patients at the beginning of the simulation (between 0 and 1)
+- Mean Panic: the average panic level of patients at the beginning of the simulation (between 0 and 1)
+- Threshold for overcrowding: number of patients that need to be near a door for the door to be considered 'overcrowded'
+- Doctors: number of doctor agents to spawn at the beginning of the simulation
+- Standard Deviation Doctor Charisma: the amount of diversity in doctor charisma desired when spawning doctor agents
+- Patient Count: number of patient agents to spawn at the beginning of the simualtion
+- Standard deviation Patient Panic: the amount of diversity in panic levels at the beginning of the simulation
+- Threshold for blocked door: number of gas agents that need to be near a door for the door to be considered 'blocked'
+- Patient Panic Weight: used to calculate panic levels, determines how much impact the number of patients and their panic levels should have on the new panic level (between 0 and 1)
+- Mean Doctor Charisma: the average doctor charisma at the beginning of the simulation (between 0 and 1)
+- Gas Panic Weight: used to calculate panic levels, determines how much impact the number of gas agents in the patient's radius of knowledge should have (between 0 and 1, ideally patient panic weight + gas panic weight + starting panic = 1)
+- Door Radius: the radius around a door used to calculate overcrowding and blocked
 
 While we have not yet implemented the logging or batch configurations that will allow us to effectively run our trials, there are two 
 charts included in the GUI. The first is the number of gas particles over time, which allows us to see the spread rate of the gas. The 
