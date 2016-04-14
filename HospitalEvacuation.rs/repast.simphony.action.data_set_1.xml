@@ -17,17 +17,31 @@
   <methodDataSources class="linked-hash-map"/>
   <countSources class="linked-hash-map">
     <entry>
-      <string>Gas Particles</string>
+      <string>Doctors</string>
       <repast.simphony.data2.engine.CountSourceDefinition>
-        <typeName>bitspls.evacuation.agents.GasParticle</typeName>
-        <id>Gas Particles</id>
+        <typeName>bitspls.evacuation.agents.Doctor</typeName>
+        <id>Doctors</id>
       </repast.simphony.data2.engine.CountSourceDefinition>
     </entry>
     <entry>
-      <string>Humans</string>
+      <string>Patients</string>
       <repast.simphony.data2.engine.CountSourceDefinition>
-        <typeName>bitspls.evacuation.agents.Human</typeName>
-        <id>Humans</id>
+        <typeName>bitspls.evacuation.agents.Patient</typeName>
+        <id>Patients</id>
+      </repast.simphony.data2.engine.CountSourceDefinition>
+    </entry>
+    <entry>
+      <string>Dead Doctors</string>
+      <repast.simphony.data2.engine.CountSourceDefinition>
+        <typeName>bitspls.evacuation.agents.Doctor</typeName>
+        <id>Dead Doctors</id>
+      </repast.simphony.data2.engine.CountSourceDefinition>
+    </entry>
+    <entry>
+      <string>Dead Patients</string>
+      <repast.simphony.data2.engine.CountSourceDefinition>
+        <typeName>bitspls.evacuation.agents.Patient</typeName>
+        <id>Dead Patients</id>
       </repast.simphony.data2.engine.CountSourceDefinition>
     </entry>
   </countSources>
