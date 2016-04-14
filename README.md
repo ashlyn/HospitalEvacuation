@@ -27,7 +27,7 @@ and will allow us to adjust the independent variables in our experiements. The l
 - Patient Count: number of patient agents to spawn at the beginning of the simualtion
 - Standard deviation Patient Panic: the amount of diversity in panic levels at the beginning of the simulation
 - Threshold for blocked door: number of gas agents that need to be near a door for the door to be considered 'blocked'
-- Patient Panic Weight: used to calculate panic levels, determines how much impact the number of patients and their panic levels should have on the new panic level(between 0 and 1)
+- Patient Panic Weight: used to calculate panic levels, determines how much impact the number of patients and their panic levels should have on the new panic level (between 0 and 1)
 - Mean Doctor Charisma: the average doctor charisma at the beginning of the simulation (between 0 and 1)
 - Gas Panic Weight: used to calculate panic levels, determines how much impact the number of gas agents in the patient's radius of knowledge should have (between 0 and 1, ideally patient panic weight + gas panic weight + starting panic = 1)
 - Door Radius: the radius around a door used to calculate overcrowding and blocked
