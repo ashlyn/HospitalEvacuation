@@ -17,7 +17,7 @@ public abstract class Human {
 	private static final double MOVEMENT_DISTANCE = 1;
 	
 	private boolean dead;
-	private boolean isGoalSeekState;
+	private boolean isGoalSeekState = true;
 	private ContinuousSpace<Object> space;
 	private Grid<Object> grid;
 	private int radiusOfKnowledge;
@@ -33,7 +33,6 @@ public abstract class Human {
 			
 			if (isGoalSeekState) {
 				if (gasToAvoid != null) {
-					System.out.println("Gas in way");
 					isGoalSeekState = false;
 				}
 			}
