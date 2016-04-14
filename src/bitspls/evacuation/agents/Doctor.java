@@ -75,9 +75,10 @@ public class Doctor extends Human {
             for(DoctorDoorPoint door : doc.doorPoints) {
                 Boolean haveKnowledgeOfDoor = false;
                 for(DoctorDoorPoint myDoor: this.doorPoints) {
-                    if (myDoor == door) {
+                    if (myDoor.getPoint() == door.getPoint()) {
                         if (myDoor.getLastVisitedTime() < door.getLastVisitedTime()) {
                             myDoor.setStatus(door.getStatus());
+                            myDoor.setLastVisitedtime(door.getLastVisitedTime());
                         }
                         haveKnowledgeOfDoor = true;
                     }
@@ -92,8 +93,7 @@ public class Doctor extends Human {
     
     private void updateDoorKnowledge() {
         List<Door> doorsInRadius = findDoorsInRadius();
-        System.out.println("num of doors in radius: " + doorsInRadius.size());
-        
+
         for(Door door: doorsInRadius) 
         {
             GridPoint gridLocation = this.getGrid().getLocation(door);
@@ -103,14 +103,15 @@ public class Doctor extends Human {
             //Check if door is in list of known doors
             for(DoctorDoorPoint doorPoint: this.doorPoints) 
             {
-                if (doorPoint.getPoint() == location) {
+                if (doorPoint.getPoint().getX() == location.getX()
+                        && doorPoint.getPoint().getY() == location.getY()) {
                     targetDoor = doorPoint;
                 }
             }
+            double ticks = RunEnvironment.getInstance().getCurrentSchedule().getTickCount();
             
             //door is not in list of known doors
             if (targetDoor == null) {
-                double ticks = RunEnvironment.getInstance().getCurrentSchedule().getTickCount();
                 targetDoor = new DoctorDoorPoint(location, DoorPointEnum.AVAILABLE, ticks);
                 this.doorPoints.add(targetDoor);
             }
@@ -123,8 +124,10 @@ public class Doctor extends Human {
             {
                 targetDoor.setStatus(DoorPointEnum.OVERCROWDED);
             }
-            
+            targetDoor.setLastVisitedtime(ticks);
         }
+        
+        System.out.println("num of doors: " + this.doorPoints.size());
     }
 
     
@@ -238,9 +241,36 @@ public class Doctor extends Human {
                 closestDoorDistance = distance;
             }
         }
+        
+        //No available doors, check overcrowded ones
+        if (closestDoor == null) {
+            closestDoor = findClosestOvercrowdedDoor();
+        }
+        
+        //All doors are blocked
+        if (closestDoor == null) {
+            
+        }
+        
         GridPoint closestDoorPoint = Utility.ndPointToGridPoint(closestDoor);
         
         return new Pair<Double, GridPoint>(closestDoorDistance, closestDoorPoint);
+    }
+    
+    private NdPoint findClosestOvercrowdedDoor() {
+        NdPoint closestDoor = null;
+        double closestDistance = Double.POSITIVE_INFINITY;
+        GridPoint pt = this.getGrid().getLocation(this);
+        
+        for(DoctorDoorPoint door : doorPoints) {
+            GridPoint doorPoint = Utility.ndPointToGridPoint(door.getPoint());
+            double distance = this.getGrid().getDistance(doorPoint, pt);
+            if (distance < closestDistance) {
+                closestDoor = door.getPoint();
+            }
+        }
+        
+        return closestDoor;
     }
     
     private GridPoint findNextLocation() {
