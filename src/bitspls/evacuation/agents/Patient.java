@@ -34,8 +34,6 @@ import repast.simphony.util.SimUtilities;
  *
  */
 public class Patient extends Human {
-	private static final int SPEED = 2;
-
 	private PatientMode movementMode;
 	private Doctor doctorToFollow;
 	private Door door;
@@ -61,7 +59,7 @@ public class Patient extends Human {
 		this.setGrid(grid);
 		this.setDead(false);
 		this.setRadiusOfKnowledge(10);
-		this.setSpeed(SPEED);
+		this.panic = stdPanic * random.nextGaussian() + meanPanic;
 		this.setBasePanic(panic);
 		this.setPanic(panic);
 		this.setWorstCase(calculateWorstCaseScenario());
@@ -71,7 +69,6 @@ public class Patient extends Human {
 		this.doctorToFollow = null;
 		this.door = null;
 		this.exited = false;
-		this.panic = stdPanic * random.nextGaussian() + meanPanic;
 	}
 	
 	/**
