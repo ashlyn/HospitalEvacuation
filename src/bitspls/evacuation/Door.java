@@ -56,6 +56,9 @@ public class Door {
         return this.blocked;
     }
 
+    /**
+     * Removes patients from the context every tick if there are patients trying to exit
+     */
     @ScheduledMethod(start = 1, interval = 1)
     public void allowPatientsToExit() {
         GridPoint pt = this.grid.getLocation(this);

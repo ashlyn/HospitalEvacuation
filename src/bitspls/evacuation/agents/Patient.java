@@ -146,6 +146,10 @@ public class Patient extends Human {
 		return pointToMoveTo;
 	}
 	
+	/**
+	 * Moves the patient towards a point and if it is a door, causes the patient
+	 * to wait by the door until it can exit
+	 */
 	protected void moveTowards(GridPoint pt) {
 		super.moveTowards(pt);
 		
@@ -340,6 +344,10 @@ public class Patient extends Human {
 		return totalPatientFactor;
 	}
 	
+	/**
+	 * Calculate the worst panic level possible
+	 * @return The worst panic level
+	 */
 	public double calculateWorstCaseScenario() {
 		GridDimensions dim = getGrid().getDimensions();
 		GridPoint center = new GridPoint(dim.getWidth() / 2, dim.getHeight() / 2);

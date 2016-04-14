@@ -94,7 +94,10 @@ public class Doctor extends Human {
     /**
 	 * Moves a doctor away from a door if they have just
 	 * dropped off patients and moves them randomly to 
-	 * explore for more patients if not actively leading
+	 * explore for more patients if not actively leading.
+	 * Attempts to allow doctors to move in a more consistent
+	 * manner by following a previous path rather than
+	 * choosing a new path.
 	 */
 	private void findPatients() {
 		if (lastPointMovedTowards != null && Math.random() > .15) {
@@ -105,7 +108,7 @@ public class Doctor extends Human {
 	}
 
     /**
-	 * Move towards a random point with no gas (simple gas avoidance)
+	 * Move towards a random point
 	 */
     private void moveRandomly() {
         GridPoint pt = this.getGrid().getLocation(this);
@@ -181,6 +184,11 @@ public class Doctor extends Human {
         }
     }
 
+    /**
+     * Updates the doctors knowledge of specific doors by updating 
+     * the status of doors or adding the doors to the list of
+     * known doors for the doctor
+     */
     private void updateDoorKnowledge() {
         List<Door> doorsInRadius = findDoorsInRadius();
 
@@ -220,7 +228,11 @@ public class Doctor extends Human {
         System.out.println("num of doors: " + this.doorPoints.size());
     }
 
-    
+    /**
+     * Determine if there are new doors nearby that can be used
+     * in the future
+     * @return The list of doors near the doctor
+     */
     private List<Door> findDoorsInRadius() {
         GridPoint location = this.getGrid().getLocation(this);
         GridCellNgh<Door> nghCreator = new GridCellNgh<Door>(this.getGrid(), location, Door.class, this.getRadiusOfKnowledge(), this.getRadiusOfKnowledge());
@@ -240,7 +252,13 @@ public class Doctor extends Human {
         return doors;
     }
     
-    private Boolean isDoorOvercrowded(Door door) {
+    /**
+     * Checks if the number of patients near a door exceeds the threshold
+     * for that door
+     * @param door The door to check for overcrowding
+     * @return boolean indication whether the door is overcrowded
+     */
+    private boolean isDoorOvercrowded(Door door) {
         GridPoint location = this.getGrid().getLocation(door);
         GridCellNgh<Patient> nghCreator = new GridCellNgh<Patient>(this.getGrid(), location, Patient.class, door.getRadius(), door.getRadius());
         List<GridCell<Patient>> gridCells = nghCreator.getNeighborhood(true);
@@ -259,7 +277,13 @@ public class Doctor extends Human {
         return true;
     }
     
-    private Boolean isDoorBlocked(Door door) {
+    /**
+     * Checks if a door is blocked by gas by comparing the number of gas
+     * particles near the door to the blocking threshold
+     * @param door The door to check
+     * @return Whether the door is blocked
+     */
+    private boolean isDoorBlocked(Door door) {
         GridPoint location = this.getGrid().getLocation(door);
         GridCellNgh<GasParticle> nghCreator = new GridCellNgh<GasParticle>(this.getGrid(), location, GasParticle.class, door.getRadius(), door.getRadius());
         List<GridCell<GasParticle>> gridCells = nghCreator.getNeighborhood(true);
@@ -312,6 +336,10 @@ public class Doctor extends Human {
         return new Pair<Double, GridPoint>(closestDoorDistance, closestDoorPoint);
     }
     
+    /**
+     * Look for a door that was previously overcrowded and attempt to use it
+     * @return The location of the door to use
+     */
     private NdPoint findClosestOvercrowdedDoor() {
         NdPoint closestDoor = null;
         double closestDistance = Double.POSITIVE_INFINITY;

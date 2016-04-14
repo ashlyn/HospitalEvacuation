@@ -147,17 +147,14 @@ public abstract class Human {
 				 * Imagining a circle of r=3 around the agent, split it into 8 45-degree segments
 				 */
 				if (angleB >= 0 && angleB <= Math.PI / 8) {
-					// check between 315 and 90
 					if (checkIfGasInBounds(currentGasPoint, pt, angleB, currentY, currentX, currentBestY, currentBestX, false, true)) {
 						bestGasPoint = currentGasPoint;
 					}
 				} else if (angleB > Math.PI / 8 && angleB <= Math.PI / 4) {
-					// check between 0 and 135
 					if (checkIfGasInBounds(currentGasPoint, pt, angleB, currentY, currentX, currentBestY, currentBestX, false, true)) {
 						bestGasPoint = currentGasPoint;
 					}
 				} else if (angleB > Math.PI / 4 && angleB <= Math.PI * 3 / 4) {
-					// check between 45 and 180
 					if (checkIfGasInBounds(currentGasPoint, pt, angleB, currentX, currentY, currentBestX, currentBestY, true, true)) {
 						bestGasPoint = currentGasPoint;
 					}
@@ -167,23 +164,19 @@ public abstract class Human {
 						bestGasPoint = currentGasPoint;
 					}
 				} else if (angleB > Math.PI && angleB <= Math.PI * 5 / 4) {
-					// check between 135 and 270
 					if (checkIfGasInBounds(currentGasPoint, pt, angleB, currentY, currentX, currentBestY, currentBestX, true, false)) {
 						bestGasPoint = currentGasPoint;
 					}
 				} else if (angleB > Math.PI * 5 / 4 && angleB <= Math.PI * 3 / 2) {
-					// check between 180 and 315
 					if (checkIfGasInBounds(currentGasPoint, pt, angleB, currentY, currentX, currentBestY,
 							currentBestX, true, false)) {
 						bestGasPoint = currentGasPoint;
 					}
 				} else if (angleB > Math.PI * 3 / 2 && angleB <= Math.PI * 7 / 4) {
-					// check between 225 and 0
 					if (checkIfGasInBounds(currentGasPoint, pt, angleB, currentX, currentY, currentBestX, currentBestY, false, false)) {
 						bestGasPoint = currentGasPoint;
 					}
-				} else {
-					// check between 270 and 45					
+				} else {			
 					if (checkIfGasInBounds(currentGasPoint, pt, angleB, currentX, currentY, currentBestX, currentBestY, false, false)) {
 						bestGasPoint = currentGasPoint;
 					}
@@ -195,17 +188,24 @@ public abstract class Human {
 	}
 	
 	/**
-	 * 
-	 * @param gas
-	 * @param human
-	 * @param originalAngle
-	 * @param height
-	 * @param length
-	 * @param bestHeight
-	 * @param bestLength
-	 * @param highHeight
-	 * @param highLength
-	 * @return
+	 * Checks to see if there is a gas agent near the path to
+	 * the door from the doctor's current location
+	 * @param gas The gas point to compare to the bounds
+	 * @param human The location of the doctor
+	 * @param originalAngle The angle of the vector to the door
+	 * @param height The "height" distance away from the doctor
+	 * This indicates a relative height as if the current angle were rotated
+	 * to exist in 0-45 degrees
+	 * @param length The "length" distance away from the doctor
+	 * This indicates a relative length as if the current angle were rotated
+	 * to exist in 0-45 degrees
+	 * @param bestHeight The current closest gas particle's height from the doctor
+	 * @param bestLength The current closest gas particle's lateral distance from the doctor
+	 * @param highHeight Indicates if we want the max or min height of the gas particles as
+	 * our best particle
+	 * @param highLength Indicates if we want the max or min length of the gas particles as
+	 * our best particle
+	 * @return Whether or not the gas was in the way of the doctor's current path
 	 */
 	private boolean checkIfGasInBounds(GridPoint gas, GridPoint human, double originalAngle,
 			int height, int length, int bestHeight, int bestLength, boolean highHeight,
