@@ -18,39 +18,57 @@ import repast.simphony.util.ContextUtils;
 import repast.simphony.util.SimUtilities;
 
 public class Door {
-	private ContinuousSpace<Object> space;
-	private Grid<Object> grid;
-	
-	public Door(ContinuousSpace<Object> space, Grid<Object> grid) {
-		this.space = space;
-		this.grid = grid;
-	}
-	
-	@ScheduledMethod(start = 1, interval = 1)
-	public void allowPatientsToExit() {
-		GridPoint pt = this.grid.getLocation(this);
-		GridCellNgh<Patient> nghCreator = new GridCellNgh<Patient>(this.grid, pt, Patient.class, 1, 1);
-		List<GridCell<Patient>> gridCells = nghCreator.getNeighborhood(true);
-		SimUtilities.shuffle(gridCells, RandomHelper.getUniform());
-		
-		List<Patient> patients = new ArrayList<Patient>();
-		for (GridCell<Patient> cell : gridCells) {
-			for (Patient p : cell.items()) {
-				patients.add(p);
-			}
-		}
-		
-		Context<Object> context = ContextUtils.getContext(this);
-		if (patients.size() > 2) {
-			SimUtilities.shuffle(patients, RandomHelper.getUniform());
-			Patient p = patients.remove(0);
-			context.remove(p);
-			p = patients.remove(0);
-			context.remove(p);
-		} else if (patients.size() > 0) {
-			for (Patient p : patients) {
-				context.remove(p);
-			}
-		}
-	}
+    private ContinuousSpace<Object> space;
+    private Grid<Object> grid;
+    private int radius;
+    private int overcrowding;
+    private int blocked;
+    
+    public Door(ContinuousSpace<Object> space, Grid<Object> grid, int radius, int overcrowding, int blocked) {
+        this.space = space;
+        this.grid = grid;
+        this.radius = radius;
+        this.overcrowding = overcrowding;
+        this.blocked = blocked;
+    }
+    
+    public int getRadius() {
+        return this.radius;
+    }
+    
+    public int getOvercrowdingThreshold() {
+        return this.overcrowding;
+    }
+    
+    public int getBlockedThreshold() {
+        return this.blocked;
+    }
+
+    @ScheduledMethod(start = 1, interval = 1)
+    public void allowPatientsToExit() {
+        GridPoint pt = this.grid.getLocation(this);
+        GridCellNgh<Patient> nghCreator = new GridCellNgh<Patient>(this.grid, pt, Patient.class, 1, 1);
+        List<GridCell<Patient>> gridCells = nghCreator.getNeighborhood(true);
+        SimUtilities.shuffle(gridCells, RandomHelper.getUniform());
+        
+        List<Patient> patients = new ArrayList<Patient>();
+        for (GridCell<Patient> cell : gridCells) {
+            for (Patient p : cell.items()) {
+                patients.add(p);
+            }
+        }
+        
+        Context<Object> context = ContextUtils.getContext(this);
+        if (patients.size() > 2) {
+            SimUtilities.shuffle(patients, RandomHelper.getUniform());
+            Patient p = patients.remove(0);
+            context.remove(p);
+            p = patients.remove(0);
+            context.remove(p);
+        } else if (patients.size() > 0) {
+            for (Patient p : patients) {
+                context.remove(p);
+            }
+        }
+    }
 }
