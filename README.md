@@ -3,9 +3,11 @@
 
 ### Running Instructions
 This project is a Repast model to simulate doctors and patients evacuating a hospital during the event of a disaster, ex. a gas leak. You
-must have Repast Simphony installed to run the simulation. To run the project, load the `HospitalEvacuation` project into Eclipse with 
+must have Repast Simphony installed to run the simulation. To run the project, load the `HospitalEvacuation` project into Eclipse with
 the Repast Simphony tools. Choose the `HosipitalEvacuation Model` launch target when running the project - the Repast Simphony GUI will 
-appear. Press the play button to run the simulation with the default settings. The simulation will end automatically when all of the 
+appear. If the launcher does not appear, choose the "Organize Favorites" option and then press the add button. Select the 
+"HospitalEvacuation Model" and add it to the favorites and then close the menu and select this launch target.
+Press the play button to run the simulation with the default settings. The simulation will end automatically when all of the 
 human agents have either exited the hospital or died.
 
 ### Space Respresentation

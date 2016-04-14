@@ -84,7 +84,6 @@ public class Doctor extends Human {
             if(shouldExit()) {
                 this.doctorMode = DoctorMode.ESCAPE;
                 moveTowardsDoor();
-                System.out.println("here");
             }
             else {
                 updateDoorKnowledge();
@@ -217,7 +216,6 @@ public class Doctor extends Human {
         if (closestDoorDistance < 3) {
             if(isGasInRadius(5)) {
                 doctorMode = DoctorMode.ESCAPE;
-                System.out.println("escape");
             }
             else {
                 doctorMode = DoctorMode.PATIENT_SEEK;
