@@ -8,12 +8,14 @@ public class Door {
     private Grid<Object> grid;
     private int radius;
     private int overcrowding;
+    private int blocked;
     
-    public Door(ContinuousSpace<Object> space, Grid<Object> grid, int radius, int overcrowding) {
+    public Door(ContinuousSpace<Object> space, Grid<Object> grid, int radius, int overcrowding, int blocked) {
         this.space = space;
         this.grid = grid;
         this.radius = radius;
         this.overcrowding = overcrowding;
+        this.blocked = blocked;
     }
     
     public int getRadius() {
@@ -22,5 +24,9 @@ public class Door {
     
     public int getOvercrowdingThreshold() {
         return this.overcrowding;
+    }
+    
+    public int getBlockedThreshold() {
+        return this.blocked;
     }
 }

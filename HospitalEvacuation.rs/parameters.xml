@@ -50,4 +50,10 @@
                 converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
                             
         />
+         <parameter name="blocked_threshold" displayName="Threshold for blocked door" type="int" 
+                defaultValue="30" 
+                isReadOnly="false" 
+                converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+                            
+        />
 </parameters>
