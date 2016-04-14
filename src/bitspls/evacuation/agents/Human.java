@@ -32,7 +32,6 @@ public abstract class Human {
 			
 			if (isGoalSeekState) {
 				if (gasToAvoid != null) {
-					System.out.println("Gas in way");
 					isGoalSeekState = false;
 				}
 			}

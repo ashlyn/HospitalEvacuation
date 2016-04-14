@@ -101,13 +101,16 @@ public class Doctor extends Human {
 		
 		System.out.println("x,y" + newX + " " + newY);
 		*/
+
+		float xRand = RandomHelper.getUniform().nextFloatFromTo(0, 1);
+		int xShift = xRand <= .34 ? 0 : xRand <= .67 ? 1 : -1;
 		
-		GridCellNgh<Object> nghCreator = new GridCellNgh<Object>(this.getGrid(), pt, Object.class, 1, 1);
+		float yRand = RandomHelper.getUniform().nextFloatFromTo(0, 1);
+		int yShift = yRand <= .34 ? -1 : yRand <= .67 ? 0 : 1;
 		
-		List<GridCell<Object>> gridCells = nghCreator.getNeighborhood(false);
-		SimUtilities.shuffle(gridCells, RandomHelper.getUniform());
+		GridPoint point = new GridPoint(pt.getX() + xShift, pt.getY() + yShift);
 		
-		GridPoint point = gridCells.get(0).getPoint(); 
+		System.out.println("old " + pt.getX() + " " + pt.getY() + " new " + point.getX() + " " + point.getY());
 		
 		super.moveTowards(point);
 	}
