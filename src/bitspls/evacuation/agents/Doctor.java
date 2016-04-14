@@ -5,12 +5,16 @@ import java.util.List;
 
 import javafx.util.Pair;
 import repast.simphony.engine.schedule.ScheduledMethod;
+import repast.simphony.query.space.grid.GridCell;
+import repast.simphony.query.space.grid.GridCellNgh;
+import repast.simphony.random.RandomHelper;
 import repast.simphony.relogo.Utility;
 import repast.simphony.space.SpatialMath;
 import repast.simphony.space.continuous.ContinuousSpace;
 import repast.simphony.space.continuous.NdPoint;
 import repast.simphony.space.grid.Grid;
 import repast.simphony.space.grid.GridPoint;
+import repast.simphony.util.SimUtilities;
 
 public class Doctor extends Human {
 	private DoctorMode doctorMode;
@@ -51,29 +55,17 @@ public class Doctor extends Human {
 	}
 	
 	private void findPatients() {
-		if (stepsTakenAwayFromDoor < 20) {
-			moveAwayFromDoor();
-		} else {
-			if (previousAngle == Double.POSITIVE_INFINITY || Math.random() > 0.4) {
-				determineAngle();
-			}
-			
 			moveRandomly();
-		}
 	}
-	
-	private void determineAngle() {
-		previousAngle = Math.random() * Math.PI * 2; 
-	}
-	
+
 	private void moveRandomly() {
 		GridPoint pt = this.getGrid().getLocation(this);
 		
-		double angleB = previousAngle;
+		/*double angleB = previousAngle;
 		
 		double angleA = Math.PI / 2;
 		 
-		double angleC = (2 * Math.PI) - angleA - angleB;
+		double angleC = Math.PI - angleA - angleB;
 
 		double sideBLength = Math.sin(angleB);
 		double sideCLength = Math.sin(angleC);
@@ -108,10 +100,16 @@ public class Doctor extends Human {
 		}
 		
 		System.out.println("x,y" + newX + " " + newY);
+		*/
 		
-		GridPoint pointToMoveTo = new GridPoint(newX, newY);
+		GridCellNgh<Object> nghCreator = new GridCellNgh<Object>(this.getGrid(), pt, Object.class, 1, 1);
 		
-		super.moveTowards(pointToMoveTo);
+		List<GridCell<Object>> gridCells = nghCreator.getNeighborhood(false);
+		SimUtilities.shuffle(gridCells, RandomHelper.getUniform());
+		
+		GridPoint point = gridCells.get(0).getPoint(); 
+		
+		super.moveTowards(point);
 	}
 	
 	private void moveAwayFromDoor() {
