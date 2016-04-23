@@ -39,3 +39,10 @@ charts included in the GUI. The first is the number of gas particles over time, 
 second charts the number of agents remaining in the simulation, by type. It plots the number of living doctors, living patients, dead 
 doctors, and dead patients. This graph gives some insights into the efficiency of the evacuation as the number of doctors/patients will 
 decrease as they exit the simulation or are poisoned and the number of dead doctors/patients will increase as they are poisoned.
+
+### Changelog
+A few changes have been made to the agent design code since it was last turned in on April 14. Below is a list of changes made and the rationale behind them.
+
+- _Gaussian vs. Uniform distribution for panic and charisma_: Hypothesis 1 was modified to compare test runs varying charisma and panic to base cases which use a 
+  uniformly-distributed charisma and panic levels. Boolean parameters to dictate whether the charisma and panic should be uniformly- or gaussian/normally-distributed 
+  were added to the UI and the code was changed to appropriately set a doctor's charisma and a patient's starting panic level appropriately.

@@ -1,83 +1,89 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <parameters>
-        <parameter name="randomSeed" displayName="Default Random Seed" type="int" 
-                defaultValue="__NULL__"
-                isReadOnly="false" 
-                converter="repast.simphony.parameter.StringConverterFactory$IntConverter"               
-        />
-        <parameter name="std_panic" displayName="StdDev Patient Panic" type="double" 
-                        defaultValue="0.10" 
-                        isReadOnly="false" 
-                        converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
-                            
-        />
-        <parameter name="mean_panic" displayName="Mean Patient Panic" type="double" 
-                        defaultValue="0.5" 
-                        isReadOnly="false" 
-                        converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
-                                    
-        />
-        <parameter name="door_count" displayName="Door Count" type="int" 
-                        defaultValue="5" 
-                        isReadOnly="false" 
-                        converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
-        />
-        <parameter name="mean_charisma" displayName="Mean Doctor Charisma" type="double" 
-                        defaultValue="0.5" 
-                        isReadOnly="false" 
-                        converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
-                                    
-        />
-        <parameter name="doctor_count" displayName="Doctors" type="int" 
-                        defaultValue="20" 
-                        isReadOnly="false" 
-                        converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
-        />
-       <parameter name="std_charisma" displayName="StdDev Doctor Charisma" type="double" 
-                        defaultValue="0.05" 
-                        isReadOnly="false" 
-                        converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
-                                    
-        />
-        <parameter name="patient_count" displayName="Patient Count" type="int" 
-                defaultValue="100" 
-                isReadOnly="false" 
-                converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
-        />
-        <parameter name="starting_panic" displayName="Starting Panic Level" type="double" 
-                defaultValue="0.5" 
-                isReadOnly="false" 
-                converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
-                            
-        />
-        <parameter name="patient_weight" displayName="Patient Panic Weight" type="double" 
-                defaultValue="0.2" 
-                isReadOnly="false" 
-                converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
-                            
-        />
-        <parameter name="gas_weight" displayName="Gas Panic Weight" type="double" 
-                defaultValue="0.3" 
-                isReadOnly="false" 
-                converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
-                            
-        />
-        <parameter name="door_radius" displayName="Door radius" type="int" 
-                defaultValue="5" 
-                isReadOnly="false" 
-                converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
-                            
-        />
-        <parameter name="overcrowding_threshold" displayName="Threshold for overcrowding" type="int" 
-                defaultValue="20" 
-                isReadOnly="false" 
-                converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
-                            
-        />
-         <parameter name="blocked_threshold" displayName="Threshold for blocked door" type="int" 
-                defaultValue="30" 
-                isReadOnly="false" 
-                converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
-                            
-        />
-</parameters>
+					<parameter name="starting_panic" displayName="Starting Panic Level" type="double" 
+						defaultValue="0.5" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+									
+		/>
+				<parameter name="gaussian_panic" displayName="Use Gaussian Panic" type="boolean" 
+						defaultValue="true" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$BooleanConverter"
+									
+		/>
+				<parameter name="mean_panic" displayName="Mean Patient Panic" type="double" 
+						defaultValue="0.5" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+									
+		/>
+				<parameter name="overcrowding_threshold" displayName="Threshold for overcrowding" type="int" 
+						defaultValue="20" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+									
+		/>
+				<parameter name="doctor_count" displayName="Doctors" type="int" 
+						defaultValue="20" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+									
+		/>
+				<parameter name="std_charisma" displayName="StdDev Doctor Charisma" type="double" 
+						defaultValue="0.05" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+									
+		/>
+				<parameter name="patient_count" displayName="Patient Count" type="int" 
+						defaultValue="100" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+									
+		/>
+				<parameter name="randomSeed" displayName="Default Random Seed" type="int" 
+						defaultValue="__NULL__"
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+									
+		/>
+				<parameter name="std_panic" displayName="StdDev Patient Panic" type="double" 
+						defaultValue="0.1" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+									
+		/>
+				<parameter name="blocked_threshold" displayName="Threshold for blocked door" type="int" 
+						defaultValue="30" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+									
+		/>
+				<parameter name="patient_weight" displayName="Patient Panic Weight" type="double" 
+						defaultValue="0.2" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+									
+		/>
+				<parameter name="mean_charisma" displayName="Mean Doctor Charisma" type="double" 
+						defaultValue="0.5" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+									
+		/>
+				<parameter name="gas_weight" displayName="Gas Panic Weight" type="double" 
+						defaultValue="0.3" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+									
+		/>
+				<parameter name="door_radius" displayName="Door radius" type="int" 
+						defaultValue="5" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+									
+		/>
+		</parameters>
+
+

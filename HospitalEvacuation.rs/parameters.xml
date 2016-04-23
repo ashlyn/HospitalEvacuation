@@ -6,6 +6,12 @@
 						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
 									
 		/>
+				<parameter name="gaussian_panic" displayName="Use Gaussian Panic" type="boolean" 
+						defaultValue="true" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$BooleanConverter"
+									
+		/>
 				<parameter name="mean_panic" displayName="Mean Patient Panic" type="double" 
 						defaultValue="0.5" 
 						isReadOnly="false" 
@@ -22,6 +28,12 @@
 						defaultValue="20" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+									
+		/>
+				<parameter name="gaussian_charisma" displayName="Use Gaussian Charisma" type="boolean" 
+						defaultValue="true" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$BooleanConverter"
 									
 		/>
 				<parameter name="std_charisma" displayName="StdDev Doctor Charisma" type="double" 
