@@ -1,12 +1,14 @@
 package bitspls.evacuation.agents;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import bitspls.evacuation.Door;
 import bitspls.evacuation.agents.Doctor;
-import bitspls.evacuation.agents.GasParticle;
 import bitspls.evacuation.agents.Human;
 import repast.simphony.context.Context;
 import repast.simphony.engine.environment.RunEnvironment;
@@ -39,11 +41,9 @@ public class Patient extends Human {
 	private Doctor doctorToFollow;
 	private Door door;
 	private boolean exited;
-	private double basePanic;
 	private double panic;
-	private double worstCase;
 	private double patientPanicWeight;
-	private double gasPanicWeight;
+	private HashMap<Doctor, Integer> blackListedDoctors;
 	
 	/**
 	 * Constructor for Patient agent
@@ -55,21 +55,19 @@ public class Patient extends Human {
 	 * @param stdPanic Standard deviation of panic level for all patients
 	 * @param random RNG to set this instance's starting panic level
 	 */
-	public Patient(ContinuousSpace<Object> space, Grid<Object> grid, double patientPanicWeight, double gasPanicWeight, double meanPanic, double stdPanic, Random random) {
+	public Patient(ContinuousSpace<Object> space, Grid<Object> grid, double patientPanicWeight, double meanPanic, double stdPanic, Random random) {
 		this.setSpace(space);
 		this.setGrid(grid);
 		this.setDead(false);
 		this.setRadiusOfKnowledge(10);
 		this.panic = getStartingPanic(meanPanic, stdPanic, random);
-		this.setBasePanic(panic);
 		this.setPanic(panic);
-		this.setWorstCase(calculateWorstCaseScenario());
 		this.setPatientPanicWeight(patientPanicWeight);
-		this.setGasPanicWeight(gasPanicWeight);
 		this.movementMode = PatientMode.AVOID_GAS;
 		this.doctorToFollow = null;
 		this.door = null;
 		this.exited = false;
+		this.blackListedDoctors = new HashMap<Doctor, Integer>();
 	}
 	
 	private double getStartingPanic(double meanPanic, double stdPanic, Random random) {
@@ -100,16 +98,27 @@ public class Patient extends Human {
 			 * of gas to the patient
 			 */			
 			this.setPanic(this.calculateNewPanicLevel());
+			this.updateBlackListedDoctors();
 
 			/*
 			 * Follow a doctor in the area if available
 			 */
 			if (this.doctorToFollow == null || this.door != null) {
 				Doctor targetDoctor = findDoctorWithMaxCharisma();
-				if(targetDoctor != null && shouldFollowDoctorAgent(targetDoctor)) {
-					this.doctorToFollow = targetDoctor;
-					this.doctorToFollow.startFollowing();
-					this.movementMode = PatientMode.FOLLOW_DOCTOR;
+				if (targetDoctor != null && !this.blackListedDoctors.containsKey(targetDoctor)) 
+				{
+					if(shouldFollowDoctorAgent(targetDoctor)) 
+					{
+						System.out.println("following doctor");
+						this.doctorToFollow = targetDoctor;
+						this.doctorToFollow.startFollowing();
+						this.movementMode = PatientMode.FOLLOW_DOCTOR;
+					}
+					else 
+					{
+						this.blackListedDoctors.put(targetDoctor, 0);
+						System.out.println("don't follow doctor");
+					}
 				}
 			}
 			
@@ -126,6 +135,29 @@ public class Patient extends Human {
 			}
 			determineNextAction(findNextPointToMoveTo());
 		}
+	}
+	
+	private void updateBlackListedDoctors() {
+		/*Iterator it = this.blackListedDoctors.entrySet().iterator();
+		List<Map.Entry> entries = new ArrayList<Map.Entry>();
+	    while (it.hasNext()) {
+	        Map.Entry pair = (Map.Entry)it.next();
+	        entries.add(pair);
+	        it.remove();
+	    }
+	    
+	    for(Map.Entry entry : entries) 
+	    {
+	    	Integer timeTick = ((Integer) entry.getValue());
+	    	if ( timeTick == 100) 
+	    	{
+	    		this.blackListedDoctors.remove(entry.getKey());
+	    	} 
+	    	else 
+	    	{
+	    		this.blackListedDoctors.put((Doctor) entry.getKey(), timeTick + 1);
+	    	}
+	    }*/
 	}
 	
 	/**
@@ -189,8 +221,8 @@ public class Patient extends Human {
 	 * @return a boolean representing whether the patient should follow the doctor
 	 */
 	public boolean shouldFollowDoctorAgent(Doctor doctor) {
-		double probabilityOfFollowingDoctor = 0.4*doctor.getCharisma() + 0.6*(1 - getPanic());
-		
+		double panicWeight = this.getPatientPanicWeight();
+		double probabilityOfFollowingDoctor = (1 - panicWeight)*doctor.getCharisma() + panicWeight*(1 - this.getPanic());
 		return randomFollowGenerator(probabilityOfFollowingDoctor);
 	}
 	
@@ -210,10 +242,15 @@ public class Patient extends Human {
 	 * @return new panic level
 	 */
 	public double calculateNewPanicLevel() {
-		double gasFactor = calculateGasParticleFactor();
-		double patientFactor = calculateGasParticleFactor();
-		double panic = this.basePanic + (this.patientPanicWeight * patientFactor) + (this.gasPanicWeight * gasFactor) ;
-		return panic;
+		List<Patient> patients = this.findPatientAgentsInRadiusOfKnowledge();
+		double totalPatientPanic = 0.0;
+		
+		for(Patient patient: patients) {
+			if (patient.getPanic() >= 0) {
+				totalPatientPanic += patient.getPanic();
+			}
+		}
+		return totalPatientPanic/patients.size();
 	}
 	
 	/**
@@ -271,28 +308,6 @@ public class Patient extends Human {
 	}
 	
 	/**
-	 * Query all cells with gas particles present in the patient's radius of knowledge
-	 * @return List of all cells containing gas inside the neighborhood
-	 */
-	private List<GridCell<GasParticle>> findGasAgentsInRadiusOfKnowledge() {
-		int radiusOfKnowledge = getRadiusOfKnowledge();
-		GridPoint location = getGrid().getLocation(this);
-
-		GridCellNgh<GasParticle> nghCreator = new GridCellNgh<GasParticle>(getGrid(), location, GasParticle.class, radiusOfKnowledge, radiusOfKnowledge);
-		List<GridCell<GasParticle>> gridCells = nghCreator.getNeighborhood(true);
-		
-		List<GridCell<GasParticle>> gasAgentLocation = new ArrayList<GridCell<GasParticle>>();
-		
-		for (GridCell<GasParticle> cell : gridCells) {
-			if(cell.size() > 0) {
-				gasAgentLocation.add(cell);
-			}
-		}
-
-		return gasAgentLocation;
-	}
-	
-	/**
 	 * Query all cells with patients present in the patient's radius of knowledge
 	 * @return List of all cells containing patients inside the neighborhood
 	 */
@@ -315,96 +330,6 @@ public class Patient extends Human {
 		return patientsInRadius;
 	}
 	
-	/**
-	 * Calculate portion of panic level resulting from panicked patients near patient
-	 * @return patient panic factor for panic level
-	 */
-	private double calculatePatientsPanicFactor() {
-		List<Patient> patients = findPatientAgentsInRadiusOfKnowledge();	
-		double worstCase = getWorstCase();
-		double patientFactor = calculateSurroundingPatientsPanicFactor(patients);
-		if (worstCase < patientFactor) {
-			return patientFactor/worstCase;
-		}
-		else {
-			return 1;
-		}
-	}
-	
-	/**
-	 * Calculate portion of panic level resulting from panicked patients near patient
-	 * @return patient panic factor for panic level
-	 */
-	private double calculateSurroundingPatientsPanicFactor(List<Patient> patients) {
-		GridPoint currentLocation = getGrid().getLocation(this);
-		double totalPatientFactor = 0.0;
-		
-		for(Patient patient: patients) {
-			GridPoint pt = getGrid().getLocation(patient);
-			double distance = getGrid().getDistance(currentLocation, pt);
-			if (distance != 0) {
-				totalPatientFactor += patient.getPanic()/distance;
-			}
-		}
-		
-		return totalPatientFactor;
-	}
-	
-	/**
-	 * Calculate the worst panic level possible
-	 * @return The worst panic level
-	 */
-	public double calculateWorstCaseScenario() {
-		GridDimensions dim = getGrid().getDimensions();
-		GridPoint center = new GridPoint(dim.getWidth() / 2, dim.getHeight() / 2);
-		
-		int radiusOfKnowledge = getRadiusOfKnowledge();
-		GridCellNgh<Patient> nghCreator = new GridCellNgh<Patient>(getGrid(), center, Patient.class,
-				radiusOfKnowledge, radiusOfKnowledge);
-		List<GridCell<Patient>> gridCells = nghCreator.getNeighborhood(false);
-
-		double total = 0.0;
-		for (GridCell<Patient> cell : gridCells) {
-			GridPoint currentPt = cell.getPoint();
-			double distance = getGrid().getDistance(center, currentPt);
-			if (distance != 0) {
-				total += 1/distance;
-			}
-		}
-		return total/3;
-	}
-	
-	/**
-	 * Calculate portion of panic level resulting from gas near patient
-	 * @return gas factor for panic level
-	 */
-	private double calculateGasParticleFactor() {
-		List<GridCell<GasParticle>> surroundingGas = findGasAgentsInRadiusOfKnowledge();
-		double surroundingFactor = calculateSurroundingGasParticleFactor(surroundingGas);
-		if(surroundingFactor > worstCase) {
-			return 1;
-		} else {
-			return calculateSurroundingGasParticleFactor(surroundingGas)/worstCase;
-		}
-	}
-	
-	/**
-	 * Calculate portion of panic level resulting from gas near patient
-	 * @return gas factor for panic level
-	 */
-	private double calculateSurroundingGasParticleFactor(List<GridCell<GasParticle>> gasAgents) {
-		GridPoint location = getGrid().getLocation(this);
-		double totalGasFactor = 0.0;
-		
-		for(GridCell<GasParticle> gas: gasAgents) {
-			GridPoint pt = gas.getPoint();
-			double distance = getGrid().getDistance(location, pt);
-			totalGasFactor += 1/distance;
-		}
-		
-		return totalGasFactor;
-	}
-	
 	/*
 	 * Getters and Setters
 	 */
@@ -415,25 +340,13 @@ public class Patient extends Human {
 	public void setPanic(double panic) {
 		this.panic = panic;
 	}
-	
-	public double getWorstCase() {
-		return this.worstCase;
-	}
-	
-	public void setWorstCase(double worstCase) {
-		this.worstCase = worstCase;
+
+	public double getPatientPanicWeight() {
+		return this.patientPanicWeight;
 	}
 	
 	public void setPatientPanicWeight(double weight) {
 		this.patientPanicWeight = weight;
-	}
-	
-	public void setGasPanicWeight(double weight) {
-		this.gasPanicWeight = weight;
-	}
-	
-	public void setBasePanic(double panic) {
-		this.basePanic = panic;
 	}
 	
 	/**
