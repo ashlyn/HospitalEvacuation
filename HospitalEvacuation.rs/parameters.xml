@@ -6,10 +6,10 @@
 						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
 									
 		/>
-				<parameter name="gaussian_panic" displayName="Use Gaussian Panic" type="boolean" 
-						defaultValue="true" 
+				<parameter name="dist_charisma" displayName="Charisma Distribution (Normal, Uniform, Constant)" type="java.lang.String" 
+						defaultValue="Normal" 
 						isReadOnly="false" 
-						converter="repast.simphony.parameter.StringConverterFactory$BooleanConverter"
+						converter="repast.simphony.parameter.StringConverterFactory$StringStringConverter"
 									
 		/>
 				<parameter name="mean_panic" displayName="Mean Patient Panic" type="double" 
@@ -30,16 +30,16 @@
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 									
 		/>
-				<parameter name="gaussian_charisma" displayName="Use Gaussian Charisma" type="boolean" 
-						defaultValue="true" 
-						isReadOnly="false" 
-						converter="repast.simphony.parameter.StringConverterFactory$BooleanConverter"
-									
-		/>
 				<parameter name="std_charisma" displayName="StdDev Doctor Charisma" type="double" 
 						defaultValue="0.05" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+									
+		/>
+				<parameter name="dist_panic" displayName="Panic Distribution (Normal, Uniform, Constant)" type="java.lang.String" 
+						defaultValue="Normal" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$StringStringConverter"
 									
 		/>
 				<parameter name="patient_count" displayName="Patient Count" type="int" 

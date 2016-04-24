@@ -31,7 +31,6 @@ import bitspls.evacuation.agents.Patient;
  * to calculate values (agent counts, starting panic, charisma, etc.)
  */
 public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
-
 	/**
 	 * Builds the initial are for the hospital evacuation simulation
 	 * @param context Context to add space, grid, and agents to
@@ -180,5 +179,4 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 		doctor.addDoor(secondClosestDoor, DoorPointEnum.AVAILABLE);
 		doctor.addDoor(thirdClosestDoor, DoorPointEnum.AVAILABLE);
 	}
-
 }

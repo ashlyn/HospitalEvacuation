@@ -68,12 +68,15 @@ public class Doctor extends Human {
     
     private double getStartingCharisma(double meanCharisma, double stdCharisma, Random random) {
 		Parameters params = RunEnvironment.getInstance().getParameters();
-		boolean useGaussian = params.getBoolean("gaussian_charisma");
-		if (useGaussian) {
-			return stdCharisma * random.nextGaussian() + meanCharisma;
+		String charismaDistribution = params.getString("dist_charisma");
+		if (charismaDistribution.toUpperCase().equals("CONSTANT")) {
+			return meanCharisma;
+		}
+		else if (charismaDistribution.toUpperCase().equals("UNIFORM")) {
+			return random.nextDouble();
 		}
 		else {
-			return random.nextDouble();
+			return stdCharisma * random.nextGaussian() + meanCharisma;
 		}
 	}
     

@@ -74,12 +74,15 @@ public class Patient extends Human {
 	
 	private double getStartingPanic(double meanPanic, double stdPanic, Random random) {
 		Parameters params = RunEnvironment.getInstance().getParameters();
-		boolean useGaussian = params.getBoolean("gaussian_panic");
-		if (useGaussian) {
-			return stdPanic * random.nextGaussian() + meanPanic;
+		String panicDistribution = params.getString("dist_panic");
+		if (panicDistribution.toUpperCase().equals("CONSTANT")) {
+			return meanPanic;
+		}
+		else if (panicDistribution.toUpperCase().equals("UNIFORM")) {
+			return random.nextDouble();
 		}
 		else {
-			return random.nextDouble();
+			return stdPanic * random.nextGaussian() + meanPanic;
 		}
 	}
 	
