@@ -11,6 +11,7 @@ import bitspls.evacuation.agents.Human;
 import repast.simphony.context.Context;
 import repast.simphony.engine.environment.RunEnvironment;
 import repast.simphony.engine.schedule.ScheduledMethod;
+import repast.simphony.parameter.Parameters;
 import repast.simphony.query.space.grid.GridCell;
 import repast.simphony.query.space.grid.GridCellNgh;
 import repast.simphony.random.RandomHelper;
@@ -59,7 +60,7 @@ public class Patient extends Human {
 		this.setGrid(grid);
 		this.setDead(false);
 		this.setRadiusOfKnowledge(10);
-		this.panic = stdPanic * random.nextGaussian() + meanPanic;
+		this.panic = getStartingPanic(meanPanic, stdPanic, random);
 		this.setBasePanic(panic);
 		this.setPanic(panic);
 		this.setWorstCase(calculateWorstCaseScenario());
@@ -69,6 +70,20 @@ public class Patient extends Human {
 		this.doctorToFollow = null;
 		this.door = null;
 		this.exited = false;
+	}
+	
+	private double getStartingPanic(double meanPanic, double stdPanic, Random random) {
+		Parameters params = RunEnvironment.getInstance().getParameters();
+		String panicDistribution = params.getString("dist_panic");
+		if (panicDistribution.toUpperCase().equals("CONSTANT")) {
+			return meanPanic;
+		}
+		else if (panicDistribution.toUpperCase().equals("UNIFORM")) {
+			return random.nextDouble();
+		}
+		else {
+			return stdPanic * random.nextGaussian() + meanPanic;
+		}
 	}
 	
 	/**

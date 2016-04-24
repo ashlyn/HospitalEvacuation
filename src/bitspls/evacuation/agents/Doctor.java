@@ -12,6 +12,7 @@ import javafx.util.Pair;
 import repast.simphony.context.Context;
 import repast.simphony.engine.environment.RunEnvironment;
 import repast.simphony.engine.schedule.ScheduledMethod;
+import repast.simphony.parameter.Parameters;
 import repast.simphony.query.space.grid.GridCellNgh;
 import repast.simphony.random.RandomHelper;
 import repast.simphony.relogo.Utility;
@@ -61,9 +62,23 @@ public class Doctor extends Human {
         this.setRadiusOfKnowledge(15);
         this.doorPoints = new ArrayList<>();
         this.followers = 0;
-        this.charisma = stdCharisma * random.nextGaussian() + meanCharisma;
+        this.charisma = getStartingCharisma(meanCharisma, stdCharisma, random);
         this.doctorMode = DoctorMode.DOOR_SEEK;
     }
+    
+    private double getStartingCharisma(double meanCharisma, double stdCharisma, Random random) {
+		Parameters params = RunEnvironment.getInstance().getParameters();
+		String charismaDistribution = params.getString("dist_charisma");
+		if (charismaDistribution.toUpperCase().equals("CONSTANT")) {
+			return meanCharisma;
+		}
+		else if (charismaDistribution.toUpperCase().equals("UNIFORM")) {
+			return random.nextDouble();
+		}
+		else {
+			return stdCharisma * random.nextGaussian() + meanCharisma;
+		}
+	}
     
     /**
 	 * Adds a door to the doctor's knowledge

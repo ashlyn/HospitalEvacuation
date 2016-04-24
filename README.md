@@ -33,9 +33,20 @@ and will allow us to adjust the independent variables in our experiements. The l
 - Mean Doctor Charisma: the average doctor charisma at the beginning of the simulation (between 0 and 1)
 - Gas Panic Weight: used to calculate panic levels, determines how much impact the number of gas agents in the patient's radius of knowledge should have (between 0 and 1, ideally patient panic weight + gas panic weight + starting panic = 1)
 - Door Radius: the radius around a door used to calculate overcrowding and blocked
+- Panic Distribution: Enter Normal, Uniform, or Constant to set the distribution type for starting panic level (Normal id default). If constant, set with Mean Panic.
+- Charisma Distribution: Enter Normal, Unifor, or Cosntant to set the distribution type for charisma level (Normal is default). If constant, set with Mean Charisma.
 
 While we have not yet implemented the logging or batch configurations that will allow us to effectively run our trials, there are two 
 charts included in the GUI. The first is the number of gas particles over time, which allows us to see the spread rate of the gas. The 
 second charts the number of agents remaining in the simulation, by type. It plots the number of living doctors, living patients, dead 
 doctors, and dead patients. This graph gives some insights into the efficiency of the evacuation as the number of doctors/patients will 
 decrease as they exit the simulation or are poisoned and the number of dead doctors/patients will increase as they are poisoned.
+
+### Changelog
+A few changes have been made to the agent design code since it was last turned in on April 14. Below is a list of changes made and the rationale behind them.
+
+- _Panic and Charisma distributions_: Hypothesis 1 was modified to compare test runs varying charisma and panic to base cases which use a 
+  uniformly-distributed charisma and panic levels and hypothesis 2 requires the ability to set panic and charisma at a constant value. 
+  String parameters to dictate whether the charisma and panic should be distributed normally (with mean and standard deviation), uniformly
+  (mean and standard deviation parameters irrelevant), or constant (based on mean parameter) were added to the UI and the code was changed to 
+  appropriately set a doctor's charisma and a patient's starting panic level appropriately.
