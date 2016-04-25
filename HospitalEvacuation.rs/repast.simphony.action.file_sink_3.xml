@@ -1,0 +1,17 @@
+<repast.simphony.data2.engine.FileSinkDescriptor>
+  <name>End Count</name>
+  <dataSet>End Counts</dataSet>
+  <delimiter>,</delimiter>
+  <format>TABULAR</format>
+  <sourceIds class="linked-hash-set">
+    <string>tick</string>
+    <string>initial_doctor_count</string>
+    <string>initial_patient_count</string>
+    <string>dead_doctor_count</string>
+    <string>dead_patient_count</string>
+    <string>doctor_count</string>
+    <string>patient_count</string>
+  </sourceIds>
+  <fileName>end_count.txt</fileName>
+  <addTimeStamp>true</addTimeStamp>
+</repast.simphony.data2.engine.FileSinkDescriptor>

@@ -51,3 +51,4 @@ local.properties
 
 # Code Recommenders
 .recommenders/
+.Rproj.user

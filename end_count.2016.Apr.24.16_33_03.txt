@@ -1,0 +1,3 @@
+"tick","initial_doctor_count","initial_patient_count","dead_doctor_count","dead_patient_count"
+1.0,0.0,0.0,0,0
+1743.0,0.0,0.0,10,6

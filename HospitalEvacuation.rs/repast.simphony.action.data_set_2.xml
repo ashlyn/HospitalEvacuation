@@ -1,54 +1,47 @@
 <repast.simphony.data2.engine.DataSetDescriptor>
-  <name>Agent Counts</name>
+  <name>End Counts</name>
   <type>AGGREGATE</type>
   <inclTick>true</inclTick>
   <inclBatchRun>false</inclBatchRun>
   <inclRandomSeed>false</inclRandomSeed>
   <scheduleParams>
     <start>1.0</start>
-    <interval>1.0</interval>
-    <priority>-Infinity</priority>
-    <pType>LAST</pType>
+    <interval>0.0</interval>
+    <priority>Infinity</priority>
+    <pType>FIRST</pType>
     <duration>-1.0</duration>
-    <frequency>REPEAT</frequency>
-    <hashCode>1189439156</hashCode>
+    <frequency>ONE_TIME</frequency>
+    <hashCode>848509061</hashCode>
   </scheduleParams>
-  <atEnd>false</atEnd>
+  <atEnd>true</atEnd>
   <methodDataSources class="linked-hash-map"/>
   <countSources class="linked-hash-map">
     <entry>
-      <string>Dead Doctors</string>
+      <string>dead_doctor_count</string>
       <repast.simphony.data2.engine.CountSourceDefinition>
         <typeName>bitspls.evacuation.agents.DeadDoctor</typeName>
-        <id>Dead Doctors</id>
+        <id>dead_doctor_count</id>
       </repast.simphony.data2.engine.CountSourceDefinition>
     </entry>
     <entry>
-      <string>Dead Patients</string>
+      <string>dead_patient_count</string>
       <repast.simphony.data2.engine.CountSourceDefinition>
         <typeName>bitspls.evacuation.agents.DeadPatient</typeName>
-        <id>Dead Patients</id>
+        <id>dead_patient_count</id>
       </repast.simphony.data2.engine.CountSourceDefinition>
     </entry>
     <entry>
-      <string>Doctors</string>
+      <string>doctor_count</string>
       <repast.simphony.data2.engine.CountSourceDefinition>
         <typeName>bitspls.evacuation.agents.Doctor</typeName>
-        <id>Doctors</id>
+        <id>doctor_count</id>
       </repast.simphony.data2.engine.CountSourceDefinition>
     </entry>
     <entry>
-      <string>Patients</string>
+      <string>patient_count</string>
       <repast.simphony.data2.engine.CountSourceDefinition>
         <typeName>bitspls.evacuation.agents.Patient</typeName>
-        <id>Patients</id>
-      </repast.simphony.data2.engine.CountSourceDefinition>
-    </entry>
-    <entry>
-      <string>Gas Particles</string>
-      <repast.simphony.data2.engine.CountSourceDefinition>
-        <typeName>bitspls.evacuation.agents.GasParticle</typeName>
-        <id>Gas Particles</id>
+        <id>patient_count</id>
       </repast.simphony.data2.engine.CountSourceDefinition>
     </entry>
   </countSources>
