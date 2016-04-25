@@ -1,10 +1,7 @@
 package bitspls.evacuation.agents;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import bitspls.evacuation.Door;
@@ -43,7 +40,7 @@ public class Patient extends Human {
 	private boolean exited;
 	private double panic;
 	private double patientPanicWeight;
-	private HashMap<Doctor, Integer> blackListedDoctors;
+	private List<Doctor> blackListedDoctors;
 	
 	/**
 	 * Constructor for Patient agent
@@ -67,7 +64,7 @@ public class Patient extends Human {
 		this.doctorToFollow = null;
 		this.door = null;
 		this.exited = false;
-		this.blackListedDoctors = new HashMap<Doctor, Integer>();
+		this.blackListedDoctors = new ArrayList<Doctor>();
 	}
 	
 	private double getStartingPanic(double meanPanic, double stdPanic, Random random) {
@@ -98,14 +95,13 @@ public class Patient extends Human {
 			 * of gas to the patient
 			 */			
 			this.setPanic(this.calculateNewPanicLevel());
-			this.updateBlackListedDoctors();
 
 			/*
 			 * Follow a doctor in the area if available
 			 */
 			if (this.doctorToFollow == null || this.door != null) {
 				Doctor targetDoctor = findDoctorWithMaxCharisma();
-				if (targetDoctor != null && !this.blackListedDoctors.containsKey(targetDoctor)) 
+				if (targetDoctor != null && !this.blackListedDoctors.contains(targetDoctor)) 
 				{
 					if(shouldFollowDoctorAgent(targetDoctor)) 
 					{
@@ -116,8 +112,7 @@ public class Patient extends Human {
 					}
 					else 
 					{
-						this.blackListedDoctors.put(targetDoctor, 0);
-						System.out.println("don't follow doctor");
+						this.blackListedDoctors.add(targetDoctor);
 					}
 				}
 			}
@@ -135,29 +130,6 @@ public class Patient extends Human {
 			}
 			determineNextAction(findNextPointToMoveTo());
 		}
-	}
-	
-	private void updateBlackListedDoctors() {
-		/*Iterator it = this.blackListedDoctors.entrySet().iterator();
-		List<Map.Entry> entries = new ArrayList<Map.Entry>();
-	    while (it.hasNext()) {
-	        Map.Entry pair = (Map.Entry)it.next();
-	        entries.add(pair);
-	        it.remove();
-	    }
-	    
-	    for(Map.Entry entry : entries) 
-	    {
-	    	Integer timeTick = ((Integer) entry.getValue());
-	    	if ( timeTick == 100) 
-	    	{
-	    		this.blackListedDoctors.remove(entry.getKey());
-	    	} 
-	    	else 
-	    	{
-	    		this.blackListedDoctors.put((Doctor) entry.getKey(), timeTick + 1);
-	    	}
-	    }*/
 	}
 	
 	/**
