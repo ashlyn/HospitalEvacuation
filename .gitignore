@@ -8,6 +8,7 @@ tmp/
 *.log
 *.log.*
 Repast.settings
+output/*.jar
 local.properties
 .settings/
 .loadpath
