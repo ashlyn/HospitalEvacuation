@@ -13,7 +13,7 @@
 									
 		/>
 				<parameter name="overcrowding_threshold" displayName="Threshold for overcrowding" type="int" 
-						defaultValue="20" 
+						defaultValue="10" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 									
@@ -25,7 +25,7 @@
 									
 		/>
 				<parameter name="std_charisma" displayName="StdDev Doctor Charisma" type="double" 
-						defaultValue="0.05" 
+						defaultValue="0.07" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
 									
@@ -37,7 +37,7 @@
 									
 		/>
 				<parameter name="patient_count" displayName="Patient Count" type="int" 
-						defaultValue="100" 
+						defaultValue="180" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 									
@@ -49,31 +49,25 @@
 									
 		/>
 				<parameter name="std_panic" displayName="StdDev Patient Panic" type="double" 
-						defaultValue="0.1" 
+						defaultValue="0.07" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
 									
 		/>
 				<parameter name="blocked_threshold" displayName="Threshold for blocked door" type="int" 
-						defaultValue="30" 
+						defaultValue="20" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 									
 		/>
 				<parameter name="patient_weight" displayName="Patient Panic Weight" type="double" 
-						defaultValue="0.2" 
+						defaultValue="0.6" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
 									
 		/>
 				<parameter name="mean_charisma" displayName="Mean Doctor Charisma" type="double" 
 						defaultValue="0.5" 
-						isReadOnly="false" 
-						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
-									
-		/>
-				<parameter name="gas_weight" displayName="Gas Panic Weight" type="double" 
-						defaultValue="0.3" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
 									
