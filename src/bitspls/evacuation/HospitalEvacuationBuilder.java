@@ -108,10 +108,9 @@ public class HospitalEvacuationBuilder implements ContextBuilder<Object> {
 		double meanPanic = params.getDouble("mean_panic");
 		double stdPanic = params.getDouble("std_panic");
 		double patientPanicWeight = params.getDouble("patient_weight");
-		double gasPanicWeight = params.getDouble("gas_weight");
 		int patientCount = params.getInteger("patient_count");
 		for (int i = 0; i < patientCount; i++) {
-			Patient p = new Patient(space, grid, patientPanicWeight, gasPanicWeight, meanPanic, stdPanic, r);
+			Patient p = new Patient(space, grid, patientPanicWeight, meanPanic, stdPanic, r);
 			context.add(p);
 		}
 
