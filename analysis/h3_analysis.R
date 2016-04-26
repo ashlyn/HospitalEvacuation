@@ -11,17 +11,39 @@ efficiencyFromData <- function(data) {
   return(efficiency)
 }
 
-data.20 <- read.table('../output/end_count.2016.Apr.24.19_15_59.txt', header=TRUE, sep=',')
-data.other <- read.table('../output/end_count.2016.Apr.24.17_11_43.txt', header=TRUE, sep=',')
+data.20 <- read.table('../output/h3_1_20.txt', header=TRUE, sep=',')
 efficiency.20 <- efficiencyFromData(data.20)
-efficiency.other <- efficiencyFromData(data.other)
 
-survival <- c(efficiency.20["efficiency.t"], efficiency.other["efficiency.t"])
-names(survival) <- c("1:20", "Other")
+data.15 <- read.table('../output/h3_1_15.txt', header=TRUE, sep=',')
+efficiency.15 <- efficiencyFromData(data.15)
+
+data.10 <- read.table('../output/h3_1_10.txt', header=TRUE, sep=',')
+efficiency.10 <- efficiencyFromData(data.10)
+
+data.5 <- read.table('../output/h3_1_5.txt', header=TRUE, sep=',')
+efficiency.5 <- efficiencyFromData(data.5)
+
+data.1 <- read.table('../output/h3_1_1.txt', header=TRUE, sep=',')
+efficiency.1 <- efficiencyFromData(data.1)
+
+survival <- c(efficiency.20["efficiency.t"], efficiency.15["efficiency.t"], efficiency.10["efficiency.t"], efficiency.5["efficiency.t"], efficiency.1["efficiency.t"])
+names(survival) <- c("1:20", "1:15", "1:10", "1:5", "1:1")
 boxplot(survival)
-title(main="Survival Rate", ylab="Survial Rate")
+title(main="Hypothesis 3: Survival Rate", ylab="Survival Rate")
 
-time <- c(efficiency.20["time"], efficiency.other["time"])
-names(time) <- c("1:20", "Other")
+survival.d <- c(efficiency.20["efficiency.d"], efficiency.15["efficiency.d"], efficiency.10["efficiency.d"], efficiency.5["efficiency.d"], efficiency.1["efficiency.d"])
+names(survival.d) <- c("1:20", "1:15", "1:10", "1:5", "1:1")
+boxplot(survival.d)
+title(main="Hypothesis 3: Survival Rate (Doctors)", ylab="Survival Rate")
+
+survival.p <- c(efficiency.20["efficiency.p"], efficiency.15["efficiency.p"], efficiency.10["efficiency.p"], efficiency.5["efficiency.p"], efficiency.1["efficiency.p"])
+names(survival.p) <- c("1:20", "1:15", "1:10", "1:5", "1:1")
+boxplot(survival.p)
+title(main="Hypothesis 3: Survival Rate (Patients)", ylab="Survival Rate")
+
+time <- c(efficiency.20["time"], efficiency.15["time"], efficiency.10["time"], efficiency.5["time"], efficiency.1["time"])
+names(time) <- c("1:20", "1:15", "1:10", "1:5", "1:1")
 boxplot(time)
-title(main="Evacuation Time", ylab="Ticks")
+title(main="Hypothesis 3: Evacuation Time", ylab="Ticks")
+
+plot(efficiency.20$efficiency.p, efficiency.20$efficiency.d, type='p', main="Hypothesis 3: Patient vs Doctor Survival Rate (1:20)", xlab="Patient Survival Rate", ylab="Doctor Survival Rate")
